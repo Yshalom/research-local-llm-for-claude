@@ -15,4 +15,4 @@ Batch-Size, Exports on CPU, RAM, VRAM, 1k-TTFT, 1k-tok/sec, 125k-TTFT, 125k-tok/
 21504,47,29.2,14.9,0.4,45.1,30.2,43.1
 23040,47,29.6,15.5,0.3,45.7,30.3,43
 24576,49,30,15.1,0.3,43.9,31.2,41.4
-26112,can't run,can't run,can't run,can't run,can't run,can't run,can't run
+26112,Model Crush,,,,,,
