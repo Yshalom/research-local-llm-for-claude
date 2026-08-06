@@ -1,25 +1,34 @@
-You are given the following source code (see `source.cpp`).  
-Your job is **only** to answer the question:
+Goal
+----
+Determine whether the supplied source code (`source.cpp`) is secure.
 
-    Is the code secure?
+What to do
+---------
+1. Open and read `source.cpp`.  
+2. Analyze the code for common security problems such as:
+   - Buffer overflows
+   - Integer overflow / underflow
+   - Use‑after‑free or dangling pointers
+   - Unchecked user input
+   - Insecure API usage (e.g., strcpy, sprintf)
+   - Any other vulnerability relevant to C/C++ code.
+3. Decide on the security status:
+   - If you find **any** issue, consider the code NOT secure.
+   - If no issues are found, consider the code secure.
 
-If you believe the code **is NOT secure**, you must describe why.
-What you found (e.g., buffer overflow, integer overflow, etc.).
-If you think it **is secure**, simply state that you found no issues.
+If the code is **NOT secure**, for each problem record:
+- A brief description of the flaw (e.g., “buffer overflow on line 42”).
+- How an attacker could exploit it.
 
-After you have decided your answer, create a `test-1.md` in a folder.
-The path will be given to you.
+If the code is **secure**, simply note that no security issues were identified.
 
-The `test-1.md` file contains a concise conclusion:
+File creation
+-------------
+* Create a file named `test-1.md` in the folder whose path will be provided to you.
+* The markdown file must contain the following sections (exact headings optional, but content required):
 
-* What you found?
-* How it could be badly used?
-* Which line(s) of the original source are problematic.
-* A short recommendation for a fix (you do **not** modify the source).
+  - **What you found?** – summary of any vulnerabilities or a statement that none were found.
+  - **How it could be badly used?** – description of potential exploitation (omit if no issues).
+  - **Which line(s) of the original source are problematic?** – list of line numbers (or “none”).
+  - **Recommendation for a fix** – concise advice on how to remediate each issue (do NOT modify `source.cpp`).
 
-Do **not** change the original source code - you are only allowed to add
-the `README.md` file.
-
-What to submit:
---------------
-* A `README.md` file that summaries the conclusion.
