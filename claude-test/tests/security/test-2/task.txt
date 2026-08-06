@@ -1,0 +1,25 @@
+You are given the following source code (see `source.cpp`).  
+Your job is **only** to answer the question:
+
+    Is the code secure?
+
+If you believe the code **is NOT secure**, you must describe why.
+What you found (e.g., buffer overflow, integer overflow, etc.).
+If you think it **is secure**, simply state that you found no issues.
+
+After you have decided your answer, create a `test-2.md` in a folder.
+The path will be given to you.
+
+The `test-2.md` file contains a concise conclusion:
+
+* What you found?
+* How it could be badly used?
+* Which line(s) of the original source are problematic.
+* A short recommendation for a fix (you do **not** modify the source).
+
+Do **not** change the original source code - you are only allowed to add
+the `README.md` file.
+
+What to submit:
+--------------
+* A `README.md` file that summaries the conclusion.
