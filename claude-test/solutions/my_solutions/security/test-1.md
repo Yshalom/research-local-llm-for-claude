@@ -1,4 +1,4 @@
-A simple buffer overflow can be achieved by entering a password longer than 20 characters.
+A simple buffer overflow can be triggered by entering a password longer than 20 characters.
 
 **test-1.cpp [Lines 67-77]**  
 ```cpp
@@ -25,11 +25,13 @@ private:
 ```
 
 *Memory layout*  
-- 21‑bytes: `password`  
-- 65‑bytes: `hash`  
-- 1‑byte: `evaluated_password`
+| Member               | Size (bytes) |
+|----------------------|--------------|
+| `password`           | 21           |
+| `hash`               | 65           |
+| `evaluated_password` | 1            |
 
-Providing an 87‑character input overwrites `evaluated_password`, allowing authentication bypass.
+If the user supplies 87 characters, the input overruns the password buffer, continues into the hash array, and finally overwrites the single byte that holds `evaluated_password`, allowing authentication bypass.
 
 ## Demo
 ```

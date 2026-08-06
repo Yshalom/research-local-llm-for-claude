@@ -1,6 +1,7 @@
-## In this test we only look for a buffer overflow, with no specific goal.
+### In this test we are only interested in locating a buffer overflow; no particular goal.
 
-An overflow can be found on the `PNG::decompressed_idat_chunks` function:  
+The overflow occurs in the member function `PNG::decompressed_idat_chunks()`
+
 **test-3/PNG/png.cpp [Lines 107-130]**  
 ```cpp
 uint8_t* PNG::decompressed_idat_chunks() const
@@ -30,15 +31,14 @@ uint8_t* PNG::decompressed_idat_chunks() const
 ```
 
 **Key Observation**  
-The buffer‑size calculation appears twice:
-
+The buffer‑size calculation is performed twice:
 - `width * height * channel_count + height`
 - `channel_count * width * height + height`
 
-They look identical, but the first uses `int32_t` for `width` and `height`, while the second treats them as `size_t` indirectly. If `width * height` overflows a 32‑bit signed integer, the first calculation may allocate a smaller buffer than expected, while the size passed to `DataProcessor::decompress` reflects the larger intended size. This discrepancy can lead to a buffer overflow.
+Although the two expressions look identical, the first uses `int32_t` for `width` and `height`, while the second treats them as `size_t` indirectly. This difference enables the overflow. If `width * height` overflows a 32‑bit signed integer, the first calculation yields a much smaller value, causing the allocation to be undersized.  
+This discrepancy can lead to a heap‑buffer overflow when the decompressor writes more data than the allocated buffer can hold.
 
-## Example
-A PNG file with header values as followed, will trigger the overflow:
-
-- `width = 0x40000000 = 1073741824`
-- `height = 4`
+## Demo
+A PNG file with the following header values will trigger the overflow:
+- width = 0x40000000 = 1073741824
+- height = 4
