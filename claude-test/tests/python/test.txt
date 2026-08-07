@@ -1,0 +1,85 @@
+TASK SPECIFICATION – SUDOKU SOLVER (PYTHON CLI, SINGLE ALGORITHM)
+===================================================================
+
+PURPOSE
+-------
+Create a command‑line program that reads one Sudoku puzzle from console, solves it using
+"backtracking with constraint propagation" (bitmask + MRV heuristic), and prints the solved
+grid to console. No GUI or external libraries are required.
+
+INPUT FORMAT
+------------
+- Exactly 9 lines, each containing 9 characters.
+- Digits 1‑9 represent fixed clues.
+- Any of ".", "0", "-", "_", " " represents an empty cell.
+- Whitespace outside the nine characters per line is ignored.
+- Example (valid input):
+53..7....
+6..195...
+.98....6.
+8...6...3
+4..8.3..1
+7...2...6
+.6....28.
+...419..5
+....8..79
+
+OUTPUT FORMAT
+-------------
+- If a solution is found: 9 lines, each with exactly 9 digits (no spaces).
+- If the puzzle has no solution: print the single line "No solution".
+- No other text should be printed on success
+
+ERROR HANDLING
+---------------
+- Incorrect number of cells or illegal characters -> write a clear message to console and exit with status 1.
+- Contradictory clues detected during parsing -> same as above.
+- Unsolvable puzzle -> print "No solution" and exit with status 0.
+
+ALGORITHM – BACKTRACKING WITH CONSTRAINT PROPAGATION
+----------------------------------------------------
+1. Board representation
+   - 9*9 list of integers, 0 for empty, 1‑9 for clues.
+
+2. Bitmask state (three arrays of length 9)
+   - "rows[r]", "cols[c]", "boxes[b]" each hold a 9‑bit integer where bit d (1<<d‑1) is set if
+   digit 'd' already appears in that row/column/3*3 box.
+
+3. Initialization
+   - Scan the initial board; for every clue set the corresponding bits in 'rows', 'cols', 'boxes'.
+   - If a bit to be set is already present -> contradiction -> abort with error.
+
+4. Candidate computation
+   - For empty cell (r,c) compute what digits can it hold (calculated from 'rows' 'cols' and 'boxes' masks).
+   - count how many different options do it has (count the digits/symbols that are allowed).
+
+5. Minimum‑Remaining‑Value (MRV) selection
+   - Among all empty cells, pick the one with the smallest count of its candidate mask.
+   - If any cell has zero candidates -> backtrack immediately.
+
+6. Recursive search:
+   - If no empty cells remain -> puzzle solved, return True.
+   - Select MRV cell (r,c) and retrieve its candidate mask.
+   - Iterate over each possible digit:
+      i. Set the corresponding bits in 'rows', 'cols', 'boxes'.
+      ii. Recurse. If recursion returns True, propagate success upward.
+      iii. On failure, undo placement (clear bits).
+   - After all candidates exhausted -> return False.
+
+7. Termination
+   - The first complete solution ends the search; no need to enumerate multiple solutions.
+   - Write the complete board to the console
+
+
+DELIVERABLE
+-----------
+A single Python file (e.g., 'sudoku_solver.py') containing:
+   - Input parsing,
+   - 'SudokuSolver' class with backtracking + constraint propagation,
+   - Minimal error handling,
+   - CLI entry point as described.
+
+END OF SPECIFICATION
+--------------------
+Follow the steps, test each component before moving on, and produce a concise,
+single‑file Python program that meets the requirements above.
