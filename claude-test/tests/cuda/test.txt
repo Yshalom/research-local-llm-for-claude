@@ -1,0 +1,53 @@
+CUDA TEST
+================================================================
+
+For this task use CUDA/C++ code
+* Implement the FFT algorithm.
+* Implement the Inverted FFT algorithm.
+
+FILE STRUCTURE
+--------------
+cuda/
+├─ gpu.cu       // The code that runs on the GPU (the kernels' code)
+├─ cpu.cu       // Code that must run on the CPU (optional)
+└─ tests.cu     // Testing code
+
+GPU CODE
+--------
+* The code need to be efficient and support minimum version of Compute Capability 12.0 (sm_120).
+* Avoid using existing implementation of the FFT algorithm.
+* The code need to run on O(nlogn) while it benefit from parallel computing, making it even faster.
+* Use cache, shared memory, etc. to take advantage of the GPU architecture for efficient code.
+* Use maximum block size of 512 threads, use as many blocks as maximize parallel computing.
+* Use variable size of 32bit, for complex use 64bit (two 32bit parts), No need for 64bit accuracy.
+* Make the code for the following GPU specs:
+   - SM count: 84
+   - Max concurrent Warps on SM: 48
+   - Memory Bus: 256 bit
+   - Warp size: 32 threads
+   - Compute Capability: 12.0
+
+TESTING
+-------
+* Write a test that take the data in 'test-data.txt', copy it into code,
+  the 'test-data.txt' won't be present in the testing environment.
+  The data itself need to hard copied into the testing code.
+  The test will yield the maximum distance between the result, and the expected
+  result.
+  Test both the FFT and the inverted FFT algorithms
+* Write a speed test, allocate a tensor of N = 1024*1024*256 values (float32).
+  Run FFT and inverted FFT algorithms and yield how fast the code ran (in nano-seconds)
+
+OS
+--
+The code must be designed to work on the Windows environment:
+* Time measurements are taken with Windows API
+* The CUDA kernels runs with the Windows 'Display adapters' driver for Nvidia GPUs
+
+ASSUMPTIONS
+-----------
+* There's enough GPU memory, upon allocation error exit with a message.
+* There's enough CPU memory, upon allocation error exit with a message.
+* There's compatible GPU in the system, upon error exit with a message.
+* Variable size of 32bit is accurate enough.
+* Cpp version is 17+
