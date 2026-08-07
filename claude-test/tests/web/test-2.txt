@@ -1,0 +1,160 @@
+PROJECT SPECIFICATION – WEB CHECKERS GAME (HTML + CSS + JAVASCRIPT)
+====================================================================
+
+OVERVIEW
+--------
+Create a browser based checkers game that can be played by a human against an AI.
+The AI must use the minimax algorithm with alpha‑beta pruning and run efficiently
+(aim for less than 200 ms per move at the default difficulty).
+All code will be written in plain HTML, CSS and JavaScript without any
+frameworks.
+
+FILE STRUCTURE
+--------------
+checkers/
+├─ index.html      // main page that loads the stylesheet and script
+├─ style.css       // visual styling for board and pieces
+└─ script.js       // game logic, rendering, user interaction and AI
+
+HTML LAYOUT (DESCRIBED IN WORDS)
+--------------------------------
+* The document uses a standard DOCTYPE html declaration.
+* In the <head> section:
+  - title element with text “Checkers”.
+  - link element referencing style.css.
+* In the <body> section, in order:
+  - An h1 heading containing the word “Checkers”.
+  - A div with id “controls” that contains:
+    • a button with id “newGameBtn” and label “New Game”.
+    • a label for a select element (id “depthSelect”) titled “AI depth:”.
+    • a select element (id “depthSelect”) offering three options:
+      – value 2 labeled “Extra Easy (2)”
+      – value 4 labeled “Easy (4)”
+      – value 6 labeled “Medium (6)” (selected by default)
+      – value 8 labeled “Hard (8)”
+      – value 10 labeled “Extra Hard (10)”
+  - A paragraph with id “status” used to display turn information or end‑game messages.
+  - A div with id “game” which will be filled dynamically with the board squares.
+  - A script tag that loads script.js.
+
+CSS DESIGN (DESCRIBED IN WORDS)
+-------------------------------
+* The #game container is displayed as a CSS grid with eight equal columns.
+* Each square is a div sized to fill its grid cell; dark and light squares
+  alternate in color to create the classic checkers board pattern.
+* Pieces are represented by circles (border‑radius 50%) inside their squares:
+  – One color for the human player’s pieces.
+  – Another color for the AI’s pieces.
+* Kings are indicated by adding a visual cue such as a thicker border or an
+  overlaid crown image; this can be achieved with an extra CSS class.
+* Hovering over a selectable piece and highlighting possible destination squares
+  is done via background‑color changes defined in CSS classes.
+* The board container keeps a square aspect ratio (using width, max‑width and the
+  aspect‑ratio property) so it scales responsively while remaining perfectly
+  proportioned.
+
+JAVASCRIPT ARCHITECTURE (DESCRIBED IN WORDS)
+--------------------------------------------
+The script is organized into four logical layers: Model, View, Controller and AI.
+
+1. MODEL – GAME STATE
+   * Board representation: an 8×8 two‑dimensional array.
+     Each cell holds a constant value (like enum) that represent it, possible values are:
+       - EMPTY
+       - HUMAN
+       - AI
+       - HUMAN-KING
+       - AI-KING
+   * Direction data:
+       – For HUMAN pieces forward moves are rows decreasing by one.
+       – For AI pieces forward moves are rows increasing by one.
+       – Kings can move in all four diagonal directions.
+
+2. VIEW – RENDERING
+   * renderBoard reads the current board array and populates the #game div with
+     eight rows of squares, assigning data attributes for row and column to each
+     square.
+   * Squares receive CSS classes that indicate whether they contain an EMPTY piece, a HUMAN piece,
+     an AI piece, a HUMAN-KING piece or an AI-KING piece.
+   * When a piece is selected, possible destination squares obtain an additional
+     highlight class.
+   * The view updates only the squares that have changed rather than rebuilding
+     the entire board each turn (optional optimization).
+   * When moving a piece make a position transition of 0.5 seconds, let the user see a movement.
+   * The AI moves would be delayed to start at least 0.5 seconds after the end of movement of the human player,
+     take into account that the minimax algorithm is taking time too,
+     it overlaps in time with the delay.
+     For example if calculation time is 0.8 seconds, the delay is only 0.2 seconds (to complete 0.5 seconds delay).
+
+3. CONTROLLER – USER INPUT AND GAME FLOW
+   * Event listeners are attached to:
+       - Squares: clicking a square belonging to the human player selects it and
+         displays legal moves.
+       - Highlighted destination squares: clicking performs the move,
+         processes any captures, promotes to king if needed, then switches turn.
+       - New Game button: resets the board to the initial layout and clears status text.
+       - Depth selector: stores the chosen depth for subsequent AI calculations.
+   * Turn management variable tracks whose turn it is (HUMAN or AI). After a
+     human move the controller invokes the AI routine if it is now the AI’s turn.
+
+4. AI – MINIMAX WITH ALPHA‑BETA PRUNING (DESCRIBED IN WORDS)
+   * Entry point function aiMove receives the desired search depth.
+   * Evaluation function:
+       - Starts with a score of zero.
+       - For each HUMAN piece on the board adds +1, for an AI piece –1.
+       - Adds an extra bonus +2 if the piece is a king.
+       - Returns the total as the board’s heuristic value. Positive values favour
+         the human; negative values favour the AI.
+   * Move generation routine getAllLegalMoves(board, player):
+       - Generates every possible move for the given player, respecting the rule
+         that captures are mandatory (if any capture exists only capture moves are returned).
+       - Handles multi‑jump sequences by recursively extending a capture chain until no further captures are available.
+   * Minimax algorithm with alpha‑beta pruning:
+       - The function receives the current board, remaining depth, alpha, beta and a flag indicating whether the node is maximizing (AI) or minimizing (human).
+       - If depth is zero or there are no legal moves, it returns the evaluation score.
+       - For a maximizing node it iterates over all legal moves, recursively calls minimax
+         on the resulting child board with decreased depth and switches to a minimizing node,
+         updates alpha and prunes when beta <= alpha.
+       - For a minimizing node it performs the symmetric operations updating beta.
+   * Applying a move (applyMove):
+       - Moves the piece from its source square to the destination.
+       - Removes any captured opponent pieces listed in the move description.
+       - Sets the king flag if the piece reaches the far side of the board.
+   * Performance considerations:
+       - Depth is limited by the user‑selected difficulty.
+       - Alpha‑beta pruning dramatically reduces the number of nodes explored.
+       - The algorithm stops early when a forced win/loss is detected (evaluation returns a very large positive or negative value).
+       - All temporary board copies are created with cloneBoard to avoid mutating the real game state.
+
+GAME RULES CHECKLIST
+--------------------
+- Board size 8*8, only dark squares used for play.
+- Each side starts with twelve pieces placed on the first three rows of their side.
+- Regular pieces move diagonally forward; kings move diagonally both forward and backward.
+- Capturing is compulsory. If a capture is possible the player must perform a capture.
+- Multiple captures (jumps) are allowed in a single turn when available.
+- Promotion to king occurs immediately after a piece reaches the opponent’s back row.
+- The game ends when a player has no legal moves; the other player wins or the
+  result is a draw if both sides cannot move.
+
+DELIVERABLES
+------------
+- index.html containing the described structure.
+- style.css providing responsive grid layout and piece appearance.
+- script.js implementing Model, View, Controller and AI as outlined.
+
+TESTING GUIDELINES
+------------------
+Functional testing:
+* Verify that every legal move is accepted and illegal moves are rejected.
+* Confirm that a capture must be made when available.
+* Test promotion to king for both sides.
+* Ensure multi‑jump sequences work correctly.
+AI validation:
+* At depth 1 the AI should always take a capture if one exists.
+* Compare AI decisions in simple forced‑win positions against known optimal moves.
+
+END OF SPECIFICATION.
+Follow the sections, testing each milestone before proceeding
+to the next. The final product should be a clean, responsive checkers game that can be played
+against an efficient minimax AI in any modern web browser.

@@ -1,0 +1,161 @@
+PROJECT SPECIFICATION – SNAKE GAME (HTML + CSS + JAVASCRIPT)
+================================================================
+
+OVERVIEW
+--------
+Create a browser based version of the classic Snake game. The player controls a
+snake that moves continuously on a rectangular grid, grows when it eats food,
+and must avoid colliding with walls or its own body. The implementation must
+use only plain HTML, CSS and JavaScript, run smoothly in any modern browser.
+
+FILE STRUCTURE
+--------------
+snake/
+├─ index.html      // page skeleton – loads stylesheet and script
+├─ style.css       // visual styling for canvas container and UI elements
+└─ script.js       // game logic, rendering loop, input handling and scoring
+
+HTML LAYOUT (DESCRIBED IN WORDS)
+--------------------------------
+* Standard <!DOCTYPE html> declaration.
+* <head> section contains
+  - title element with text “Snake”.
+  - link element referencing style.css.
+* <body> section, in order:
+  - An h1 heading with the word “Snake”.
+  - A div with id “ui” that holds three elements:
+    • a button with id “startBtn” and label “Start Game”.
+    • a span with id “scoreDisplay” initially showing “Score: 0”.
+    • a paragraph with id “message” for status messages such as “Game Over”.
+  - A canvas element with id “gameCanvas”. The script will set its logical size
+    to the classic 400 × 400 pixels and scale it via CSS to fit the viewport
+    while preserving aspect ratio.
+  - A script tag that loads script.js.
+
+CSS DESIGN (DESCRIBED IN WORDS)
+-------------------------------
+* Body uses a neutral background color and centres the UI elements vertically
+  and horizontally.
+* The #ui container is positioned above the canvas, centred, with a small margin
+  separating it from the game area.
+* The canvas (#gameCanvas):
+  - Is given a fixed logical size of 400 × 400 pixels.
+  - Is scaled by CSS to fill the available screen width while keeping its aspect
+    ratio.
+  - Has a thin solid border or subtle box‑shadow for visual separation.
+* UI elements (button, score text, message paragraph) use a simple readable font,
+  adequate padding and margin, and are styled with plain colors that contrast
+  the background.
+
+JAVASCRIPT ARCHITECTURE (DESCRIBED IN WORDS)
+--------------------------------------------
+The script is organized into four logical layers: Model, View, Controller and
+Game Loop.
+
+1. MODEL - GAME STATE
+   * Constants:
+     - GRID_SIZE: number of cells per side (20). The canvas will be divided
+       equally so each cell has size CELL_PIXELS = canvasWidth / GRID_SIZE.
+     - INITIAL_SNAKE_LENGTH: starting length of the snake (3).
+     - START_SPEED: number of moves per second at the beginning of a game.
+     - SPEED_INCREMENT: amount by which speed increases after each food is eaten.
+   * Variables:
+     - snakeBody: an array of objects representing the segments. Each object holds
+       row and col indices. The first element is the head; the last element is the tail.
+     - currentDirection: one of “up”, “down”, “left”, “right”. Initial direction can be “right”.
+     - nextDirection: used to store a pending turn request from the player so that
+       opposite direction changes are ignored (e.g., cannot go directly from up to down).
+     - foodPosition: object with row and col where the current food appears.
+     - score: integer count of how many foods have been eaten.
+     - moveInterval: time in milliseconds between successive moves, derived from speed.
+     - lastMoveTime: timestamp of the most recent snake movement (used for timing).
+     - gameRunning: boolean flag indicating whether the main loop should update.
+
+2. VIEW – RENDERING
+   * Obtain the 2-D drawing context from the canvas element.
+   * Compute pixel coordinates based on CELL_PIXELS,
+     then fill a rectangle of that size with the supplied color.
+       - Iterate over snakeBody.
+       - For the head use a distinct color and for body segments
+         use a slightly darker shade.
+   * Draw the food with a conspicuous color such as red.
+   * The snake movement have a transition time (that is driven from the snake's
+     speed), make the snake movement continuous.
+
+3. CONTROLLER – INPUT AND STATE CHANGES
+   * Input handling:
+       - Listen for keydown events on the document.
+         Accept ArrowUp, ArrowDown, ArrowLeft, ArrowRight as well as WASD keys.
+         When a valid direction key is pressed, set nextDirection to that direction
+         only if it is not opposite of currentDirection (to prevent immediate self‑collision).
+       - There's no need to program UI for mobile devices (listen for touch swipe).
+   * Start button handling:
+       - Clicking #startBtn calls resetGame() and then starts the main loop by
+         setting gameRunning to true and invoking requestAnimationFrame(loop).
+   * Collision detection (called each move step):
+       - Wall collision: if head row or col is outside 0 … GRID_SIZE‑1, the snake dies.
+       - Self collision: if head position matches any other segment in snakeBody,
+         the snake dies.
+       - Food collision: if head position equals foodPosition, increase score,
+         grow the snake (by not removing the tail on this move), optionally
+         increase speed, and call placeFood() to generate a new piece of food.
+
+4. GAME LOOP – TIMED UPDATE AND RENDER
+   * Use requestAnimationFrame(loop) where loop(timestamp) receives the current
+     high‑resolution time.
+   * Inside loop:
+       - If gameRunning is false, exit without scheduling another frame.
+       - Compute elapsed = timestamp – lastMoveTime.
+       - If elapsed >= moveInterval:
+           • Update currentDirection to nextDirection (if a new direction was set).
+           • Determine the new head position by adding one cell in the direction
+             indicated by currentDirection.
+           • Insert the new head coordinates at the beginning of snakeBody.
+           • Perform collision checks described above.
+               – If a death condition is met, set gameRunning = false,
+                 display “Game Over” in #message, show the start button again and
+                 stop further frames.
+           • If food was not eaten on this move, remove the last element of
+             snakeBody (the tail) so that length stays constant; if food was
+             eaten, keep the tail to grow by one segment.
+           • Update score display, clear screen, draw snake and food.
+           • Record lastMoveTime = timestamp.
+       - Schedule next frame with requestAnimationFrame(loop).
+
+PERFORMANCE CONSIDERATIONS
+--------------------------
+* All calculations use integer grid coordinates; no floating point arithmetic is
+  required for movement.
+* The snakeBody array grows only when food is eaten, which happens relatively
+  infrequently, so push/pop operations are cheap.
+* Rendering:
+  - The head and tail will have movements, positional transition to make the snake
+    movements look continuous and smooth.
+  - The body of the snake can be draw as set of primitive shapes.
+  - Try to avoid drawing part of the snake body where there's no change,
+    in the current frame from the last.
+* requestAnimationFrame automatically throttles rendering when the tab is not
+  visible, preserving CPU and battery life.
+
+DELIVERABLES
+------------
+1. index.html – page containing the canvas, UI controls and script inclusion.
+2. style.css – responsive styling for canvas and UI elements.
+3. script.js – complete implementation of model, view, controller and game loop as described.
+
+TESTING GUIDELINES
+------------------
+Functional Tests
+- Verify that pressing an arrow key or WASD changes the snake’s direction,
+  but not to the opposite of its current travel.
+- Confirm that the snake moves continuously at the expected speed.
+- Ensure food appears in a location not occupied by the snake and that eating it
+  grows the snake by one segment and increments the score.
+- Test wall collision - colliding with a wall ends the game.
+- Test self‑collision - running into any part of the snake’s own body ends the game.
+- After “Game Over”, press the Start button and verify that the game resets to its initial state.
+
+END OF SPECIFICATION.
+Follow the sections, testing each component before proceeding to the next stage.
+The final product should be a clean, responsive Snake game that runs smoothly
+in any modern web browser without any external libraries or frameworks.
