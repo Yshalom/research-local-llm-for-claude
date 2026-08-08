@@ -29,11 +29,10 @@ GPU CODE
 
 TESTING
 -------
-* Write a test that take the data in 'test-data.txt', copy it into code,
-  the 'test-data.txt' won't be present in the testing environment.
-  The data itself need to hard copied into the testing code.
-  The test will yield the maximum distance between the result, and the expected
-  result.
+* Write a test that take the data in 'test-data.txt' and test on it,
+  you can assume that the file exist in the exact format in the testing environment.
+  The test will yield the maximum distance between the calculated result, and the expected
+  result (from the file).
   Test both the FFT and the inverted FFT algorithms
 * Write a speed test, allocate a tensor of N = 1024*1024*256 values (float32).
   Run FFT and inverted FFT algorithms and yield how fast the code ran (in nano-seconds)

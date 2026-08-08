@@ -1,4 +1,4 @@
-TASK SPECIFICATION – SUDOKU SOLVER (PYTHON CLI, SINGLE ALGORITHM)
+TASK SPECIFICATION – SUDOKU SOLVER (PYTHON CONSOLE, SINGLE ALGORITHM)
 ===================================================================
 
 PURPOSE
@@ -9,6 +9,8 @@ grid to console. No GUI or external libraries are required.
 
 INPUT FORMAT
 ------------
+- Ask the user for input (print message).
+- Read exactly 9 lines from the console.
 - Exactly 9 lines, each containing 9 characters.
 - Digits 1‑9 represent fixed clues.
 - Any of ".", "0", "-", "_", " " represents an empty cell.
@@ -76,8 +78,7 @@ DELIVERABLE
 A single Python file (e.g., 'sudoku_solver.py') containing:
    - Input parsing,
    - 'SudokuSolver' class with backtracking + constraint propagation,
-   - Minimal error handling,
-   - CLI entry point as described.
+   - Minimal error handling.
 
 END OF SPECIFICATION
 --------------------
