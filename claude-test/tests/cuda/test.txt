@@ -9,6 +9,7 @@ FILE STRUCTURE
 --------------
 cuda/
 ├─ gpu.cu       // The code that runs on the GPU (the kernels' code)
+├─ gpu.cuh      // Header for the GPU code (it is included in the testing code)
 └─ tests.cu     // Testing code
 
 GPU CODE
