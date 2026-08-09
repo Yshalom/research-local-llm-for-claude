@@ -8,16 +8,17 @@ For this task use CUDA/C++ code
 FILE STRUCTURE
 --------------
 cuda/
-├─ gpu.cu       // The code that runs on the GPU (the kernels' code)
-├─ gpu.cuh      // Header for the GPU code (it is included in the testing code)
-└─ tests.cu     // Testing code
+├─ gpu.cu         // The code that runs on the GPU (the kernels' code)
+├─ gpu.cuh        // Header for the GPU code (it is included in the testing code)
+├─ tests.cu       // Testing code
+└─ test-data.txt  // provided to you (the same as the one in this test folder)
 
 GPU CODE
 --------
-* The code need to be efficient and support minimum version of Compute Capability 12.0 (sm_120).
-* Avoid using existing implementation of the FFT algorithm.
-* The code need to run on O(nlogn) while it benefit from parallel computing, making it even faster.
-* Use cache, shared memory, etc. to take advantage of the GPU architecture for efficient code.
+* Efficient code utilizing the GPU parallelism capabilities.
+* Support Compute Capability 12.0 (sm_120) devices.
+* Overall run-time O(nlogn), while implementing parallel computing, making it even faster.
+* Use cache, shared memory, variable shuffling, and etc.
 * Use maximum block size of 512 threads, use as many blocks as maximize parallel computing.
 * Use variable size of 32bit, for complex use 64bit (two 32bit parts), No need for 64bit accuracy.
 * Make the code for the following GPU specs:
@@ -26,6 +27,44 @@ GPU CODE
    - Memory Bus: 256 bit
    - Warp size: 32 threads
    - Compute Capability: 12.0
+
+CODE
+----
+* Separate to functions.
+* Give variables proper names.
+* Write clean and easy to read code.
+* Implement complex numbers math, and use it.
+* Manage the memory (allocate, free).
+
+FFT ALGORITHM
+-------------
+Here is example of the FFT algorithm, you need to do the same logic, in CUDA (utilizing parallelism).
+The IFFT isn't given here, but you need to implement it too
+(you may write single function that gets a true/false flag for the invert property)
+```
+def fft(x: Sequence[complex]) -> List[complex]:
+    N = len(x)
+    # ----- Base case -------------------------------------------------------
+    if N == 1:
+        return [x[0]]
+
+    # ----- Validate length -------------------------------------------------
+    if (N & (N - 1)) != 0:                # N is not a power of two?
+        raise ValueError("FFT requires the input length to be a power of 2")
+
+    # ----- Split into even and odd indexed elements ------------------------
+    even = fft(x[0::2])    # samples at indices 0,2,4,...
+    odd  = fft(x[1::2])    # samples at indices 1,3,5,...
+
+    # ----- Combine the two halves -------------------------------------------
+    # twiddle factor: exp(-2*pi*i * k / N)
+    combined = [0] * N
+    for k in range(N // 2):
+        t = cmath.exp(-2j * cmath.pi * k / N) * odd[k]
+        combined[k] = even[k] + t # lower half
+        combined[k + N//2] = even[k] - t # upper half
+    return combined
+```
 
 TESTING
 -------
