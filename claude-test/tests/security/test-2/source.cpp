@@ -51,7 +51,7 @@ void sha256(char* data, size_t data_length, char* dst)
 
     // Get hash
     DWORD hash_len = HASH_SIZE;
-    BYTE* hash[HASH_SIZE];
+    BYTE hash[HASH_SIZE];
     if (!CryptGetHashParam(hHash,
         HP_HASHVAL,
         (BYTE*)hash,
@@ -79,7 +79,7 @@ public:
         wscanf_s(L"%u", &password_length);
         password_length++; // make space for null terminater
         password_byte_count = password_length * sizeof(wchar_t);
-        
+
         void* memory = malloc(password_byte_count + HASH_STRING_LENGTH);
         password = (wchar_t*)memory;
         hash = (char*)memory + password_byte_count;

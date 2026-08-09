@@ -9,22 +9,22 @@ grid to console. No GUI or external libraries are required.
 
 INPUT FORMAT
 ------------
-- Ask the user for input (print message).
-- Read exactly 9 lines from the console.
+- Ask the user for input (use the `print()` function).
+- Read exactly 9 lines from the console (using the `input()` function).
 - Exactly 9 lines, each containing 9 characters.
 - Digits 1‑9 represent fixed clues.
 - Any of ".", "0", "-", "_", " " represents an empty cell.
 - Whitespace outside the nine characters per line is ignored.
 - Example (valid input):
 53..7....
-6..195...
-.98....6.
-8...6...3
+6.0195
+ 98.-..6.
+8...6  .3
 4..8.3..1
-7...2...6
+7.0.2...6
 .6....28.
-...419..5
-....8..79
+.-.419..5
+..__8..79
 
 OUTPUT FORMAT
 -------------
@@ -79,6 +79,13 @@ A single Python file (e.g., 'sudoku_solver.py') containing:
    - Input parsing,
    - 'SudokuSolver' class with backtracking + constraint propagation,
    - Minimal error handling.
+
+TESTING
+-------
+You have installed python in the environment.
+Run the code!
+Test the result!
+Make sure it is running and correct.
 
 END OF SPECIFICATION
 --------------------

@@ -33,7 +33,8 @@ TESTING
   you can assume that the file exist in the exact format in the testing environment.
   The test will yield the maximum distance between the calculated result, and the expected
   result (from the file).
-  Test both the FFT and the inverted FFT algorithms
+* Look on the 'test-data.txt' file (it's in the same folder as this file).
+* Test both the FFT and the inverted FFT algorithms.
 * Write a speed test, allocate a tensor of N = 1024*1024*256 values (float32).
   Run FFT and inverted FFT algorithms and yield how fast the code ran (in nano-seconds)
 
@@ -42,6 +43,7 @@ OS
 The code must be designed to work on the Windows environment:
 * Time measurements are taken with Windows API
 * The CUDA kernels runs with the Windows 'Display adapters' driver for Nvidia GPUs
+* Note: You don't have CUDA in your environment, think and try to make the code as best as you can.
 
 ASSUMPTIONS
 -----------
