@@ -1,6 +1,6 @@
 #include "utils.h"
 
-int32_t change_endian(int32_t v)
+uint32_t change_endian(uint32_t v)
 {
 	return ((v << 24)	& 0xff000000)	// byte-1
 		| ((v << 8)		& 0x00ff0000)	// byte-2

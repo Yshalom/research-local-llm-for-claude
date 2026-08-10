@@ -1,6 +1,6 @@
 #include "png_chunk_idat.h"
 
-PngChunkIdat::PngChunkIdat(std::ifstream& input, int32_t length)
+PngChunkIdat::PngChunkIdat(std::ifstream& input, uint32_t length)
 {
 	// length
 	m_length = length;
@@ -10,6 +10,10 @@ PngChunkIdat::PngChunkIdat(std::ifstream& input, int32_t length)
 	if (!m_data)
 		throw std::runtime_error("There was a problem while allocating the memory!");
 	input.read((char*)m_data, length);
+
+	if (input.eof())
+		throw std::runtime_error("End-Of-File; couldn't find IEND header; the file is corrupted!");
+
 	// CRC
 	input.seekg(4, std::ios_base::cur);
 }

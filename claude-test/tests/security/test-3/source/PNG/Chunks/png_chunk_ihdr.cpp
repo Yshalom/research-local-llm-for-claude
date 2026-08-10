@@ -7,7 +7,7 @@
 
 constexpr size_t CHUNK_LENGTH = 13;
 
-PngChunkIhdr::PngChunkIhdr(std::ifstream& input, int32_t length)
+PngChunkIhdr::PngChunkIhdr(std::ifstream& input, uint32_t length)
 {
 	// test length
 	m_length = length;
@@ -16,7 +16,7 @@ PngChunkIhdr::PngChunkIhdr(std::ifstream& input, int32_t length)
 
 	// read header data
 		// 4-bytes
-	int32_t v;
+	uint32_t v;
 	input.read((char*)&v, sizeof(v));
 	m_width = change_endian(v);
 	input.read((char*)&v, sizeof(v));
@@ -70,12 +70,12 @@ const char* PngChunkIhdr::get_type() const
 	return "IHDR";
 }
 
-int32_t PngChunkIhdr::get_width() const
+uint32_t PngChunkIhdr::get_width() const
 {
 	return m_width;
 }
 
-int32_t PngChunkIhdr::get_height() const
+uint32_t PngChunkIhdr::get_height() const
 {
 	return m_height;
 }

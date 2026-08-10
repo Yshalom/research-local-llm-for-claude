@@ -11,7 +11,7 @@ private:
 	bool m_auto_free;
 
 public:
-	PngChunkIdat(std::ifstream& input, int32_t length);
+	PngChunkIdat(std::ifstream& input, uint32_t length);
 	~PngChunkIdat();
 
 	PngChunkIdat(const PngChunkIdat&) = delete;

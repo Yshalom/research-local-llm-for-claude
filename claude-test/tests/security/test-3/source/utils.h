@@ -2,5 +2,5 @@
 
 #include <cinttypes>
 
-int32_t change_endian(int32_t);
+uint32_t change_endian(uint32_t);
 
