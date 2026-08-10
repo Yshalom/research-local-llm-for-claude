@@ -87,4 +87,7 @@ int64_t DataProcessor::decompress(void* dst_buffer, size_t dst_max_size, void* s
 
         // If we get here we made progress and can continue with the next chunk.
     }
+
+    // If we get here, the buffer is too small from containing the data
+    return -1;
 }

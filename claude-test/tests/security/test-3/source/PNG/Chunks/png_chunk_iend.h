@@ -9,7 +9,7 @@ class PngChunkIend : public PngChunk
 private:
 
 public:
-	PngChunkIend(std::ifstream& input, int32_t length);
+	PngChunkIend(std::ifstream& input, uint32_t length);
 
 	// getters
 	const char* get_type() const override;
