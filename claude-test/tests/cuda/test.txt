@@ -36,11 +36,33 @@ CODE
 * Implement complex numbers math, and use it.
 * Manage the memory (allocate, free).
 
+FUNCTIONS
+---------
+* __global__ void fft_kernel(const complex* input, const complex* output, unsigned int size, bool invert = false);
+    // The GPU kernel of the function
+* void fft(const complex* input, const complex* output, unsigned int size);
+    // Launch the kernel, decide Grid layout too.
+* void ifft(const complex* input, const complex* output, unsigned int size);
+    // Launch the kernel, decide Grid layout too.
+* void test_data(char* file_name);
+    // read the file, get the input/output buffers, do fft & ifft
+    // print the maximum error between the result (calculated) and the expected result (read from file):
+    // > "Maximum error of fft: ..."
+    // > "Maximum error of ifft: ..."
+* void test_speed(size N);
+    // Create random array of N items, preform fft followed by ifft.
+    // Measure the time it took at each step, and print it output.
+    // > " FFT with ... elements: ...ns"
+    // > "IFFT with ... elements: ...ns"
+* Extra helper function, if you need them
+
 FFT ALGORITHM
 -------------
-Here is example of the FFT algorithm, you need to do the same logic, in CUDA (utilizing parallelism).
-The IFFT isn't given here, but you need to implement it too
-(you may write single function that gets a true/false flag for the invert property)
+* Here is example of the FFT algorithm, you need to do the same logic, in CUDA (utilizing parallelism).
+  The following is just example, you don't need to stick to this specific example.
+* The IFFT isn't given here, but you need to implement it too (write single function that gets a true/false
+  flag for the invert property).
+* You may assume the input is size is in the 2^N pattern (the exact size for a call is run-time variable).
 ```
 def fft(x: Sequence[complex]) -> List[complex]:
     N = len(x)
@@ -70,12 +92,15 @@ TESTING
 -------
 * Write a test that take the data in 'test-data.txt' and test on it,
   you can assume that the file exist in the exact format in the testing environment.
-  The test will yield the maximum distance between the calculated result, and the expected
-  result (from the file).
+  The test will yield the maximum distance between the calculated result (from the fft function),
+  and the expected result (from the file).
+  Test both the fft & ifft functions;
 * Look on the 'test-data.txt' file (it's in the same folder as this file).
 * Test both the FFT and the inverted FFT algorithms.
-* Write a speed test, allocate a tensor of N = 1024*1024*256 values (float32).
-  Run FFT and inverted FFT algorithms and yield how fast the code ran (in nano-seconds)
+* Write a speed test:
+    - Allocate a random array of N = 1024*1024*256 = 2^28 (complex) items,
+      the random range is (-1, 1).
+    - Run FFT and inverted FFT algorithms and yield how fast the code ran (in nano-seconds)
 
 OS
 --
