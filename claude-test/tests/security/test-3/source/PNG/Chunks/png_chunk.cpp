@@ -1,6 +1,6 @@
 # include "png_chunk.h"
 
-int32_t PngChunk::get_length() const
+uint32_t PngChunk::get_length() const
 {
 	return m_length;
 }

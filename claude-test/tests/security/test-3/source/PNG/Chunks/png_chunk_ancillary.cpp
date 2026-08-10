@@ -1,6 +1,6 @@
 #include "png_chunk_ancillary.h"
 
-PngChunkAncillary::PngChunkAncillary(std::ifstream& input, int32_t length, const char type[4])
+PngChunkAncillary::PngChunkAncillary(std::ifstream& input, uint32_t length, const char type[4])
 {
 	// length
 	m_length = length;

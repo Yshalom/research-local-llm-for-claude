@@ -11,9 +11,9 @@
 
 constexpr char PNG_SIGNATURE[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
 
-void read_length_type(std::ifstream& input_file, int32_t& length, char type[4])
+void read_length_type(std::ifstream& input_file, uint32_t& length, char type[4])
 {
-	input_file.read((char*)&length, sizeof(int32_t));
+	input_file.read((char*)&length, sizeof(uint32_t));
 	length = change_endian(length);
 	input_file.read(type, sizeof(char[4]));
 }
@@ -32,7 +32,7 @@ PNG::PNG(const wchar_t* file_name)
 		throw std::runtime_error("Wrong file signature; the file is corrupted!");
 
 	// ------------------- Read chunks -------------------
-	int32_t length;
+	uint32_t length;
 	char type[4];
 
 	// Read the header
@@ -43,11 +43,11 @@ PNG::PNG(const wchar_t* file_name)
 
 	PngChunk* chunk = &m_header;
 	while (true) {
+		read_length_type(input_file, length, type);
+
 		if (input_file.eof())
 			throw std::runtime_error("End-Of-File; couldn't find IEND header; the file is corrupted!");
-
-		read_length_type(input_file, length, type);
-		
+			
 		if (_strnicmp("IDAT", type, 4) == 0)
 			chunk->set_next(new PngChunkIdat(input_file, length));
 		else if (_strnicmp("IEND", type, 4) == 0)
@@ -106,7 +106,7 @@ void PNG::concat_idat_data(void* dst, size_t size) const
 
 uint8_t* PNG::decompressed_idat_chunks() const
 {
-	int32_t width = m_header.get_width(),
+	uint32_t width = m_header.get_width(),
 		height = m_header.get_height();
 	size_t channel_count = m_header.get_channel_count();
 
