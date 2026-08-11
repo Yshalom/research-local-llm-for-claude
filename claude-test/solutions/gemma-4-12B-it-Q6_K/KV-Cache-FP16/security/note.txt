@@ -1,0 +1,2 @@
+Both `test-2.md` and `test-3.md where created under the "claude-test\tests\security\test-#"
+despite give the agent the specific place to put them in!
