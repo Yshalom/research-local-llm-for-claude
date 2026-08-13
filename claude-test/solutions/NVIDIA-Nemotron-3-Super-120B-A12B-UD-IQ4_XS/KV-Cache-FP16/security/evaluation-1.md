@@ -2,7 +2,7 @@
 
 ### Score: 20/20
 
-| Subject |  | Note |
+| subject | score | note |
 | --- | --- | --- |
 | What you found? | 5 | It found the vulnerability |
 | How it could be badly used? | 5 | Explain that a corruption of the `evaluated_password` flag, would be triggered by abusing the buffer overflow of `password`. Point out that `scanf("%s", password);` causes the overflow. *Quote: """Bypass password verification by manipulating the `evaluated_password` flag directly"""* |
