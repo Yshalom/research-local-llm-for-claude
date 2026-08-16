@@ -55,6 +55,9 @@ TICK_LABEL_FONT_SIZE = 12              # axis numbers
 LABEL_SPACING_VERT = 20                # vertical space between series labels
 LABEL_OFFSET_FROM_TOP = PADDING_TOP // 2
 LABEL_OFFSET_FROM_RIGHT = 10           # distance of label block from right edge
+TITLE_FONT_SIZE = 18                   # title font size
+TITLE_OFFSET_FROM_TOP = 30             # distance of title from top edge
+TITLE_COLOR = "blue"
 
 # SVG overall layout
 SVG_BACKGROUND = None
@@ -180,10 +183,10 @@ def make_scaling(x_min: Number, x_max: Number, y_min: Number, y_max: Number):
             return (out_min + out_max) / 2.0
         return out_min + (v - v_min) * (out_max - out_min) / (v_max - v_min)
     
-    def sx(x):
+    def sx(x: Number) -> Number:
         return map_value(x, x_min, x_max, PADDING_LEFT, CANVAS_WIDTH - PADDING_RIGHT)
 
-    def sy(y):
+    def sy(y: Number) -> Number:
         return map_value(y, y_min, y_max, CANVAS_HEIGHT - PADDING_BOTTOM, PADDING_LEFT)
     
     return sx, sy
@@ -319,18 +322,22 @@ def draw_labels(svg_parts: list[str], labels, label_x, label_y_start, label_spac
 def draw_rectangle(svg_parts: list[str], width, height, color) -> None:
     svg_parts.append(f'<rect width="{width}" height="{height}" fill="{color}"/>')
 
+def draw_title(svg_parts: list[str], title: str, title_x, title_y, color) -> None:
+    svg_parts.append(
+        f'  <text x="{title_x}" y="{title_y}" '
+        f'text-anchor="middle" font-family="sans-serif" '
+        f'font-size="{TITLE_FONT_SIZE}" fill="{color}">{title}</text>'
+    )
+
 
 # ----------------------------------------------------------------------
 # SVG creation functions
 # ----------------------------------------------------------------------
 
-def make_svg_parts(ni_values: tuple[str], batch_values: tuple[int], data: dict[(str, int), float]) -> list[str]:
+def make_svg_parts(ni_values: tuple[str], batch_values: tuple[int], data: dict[(str, int), float], title: str) -> list[str]:
+    # Produce plot's parts list
     x_min, x_max = compute_limits(batch_values)
     y_min, y_max = compute_limits(data.values())
-    
-    # ------------------------------------------------------------------
-    # Produce plot's parts list
-    # ------------------------------------------------------------------
     scaling_x_func, scaling_y_func = make_scaling(x_min, x_max, y_min, y_max)
 
     svg_parts = []
@@ -338,6 +345,8 @@ def make_svg_parts(ni_values: tuple[str], batch_values: tuple[int], data: dict[(
 
     if SVG_BACKGROUND:
         draw_rectangle(svg_parts, CANVAS_WIDTH, CANVAS_HEIGHT, SVG_BACKGROUND) # Draw background
+
+    draw_title(svg_parts, title, CANVAS_WIDTH / 2, TITLE_OFFSET_FROM_TOP, TITLE_COLOR)
 
     draw_grid_and_ticks(svg_parts, x_min, x_max, y_min, y_max, scaling_x_func, scaling_y_func)
     draw_axes(svg_parts, x_min, x_max, y_min, y_max, scaling_x_func, scaling_y_func)
@@ -367,13 +376,13 @@ def csv2svg(csv_filepath: str, ttft_svg_filepath: str, tok_svg_filepath: str) ->
     # ------------------------------------------------------------------
     # Produce TTFT plot
     # ------------------------------------------------------------------
-    svg_parts_ttft = make_svg_parts(ni_values, batch_values, ttft_data)
+    svg_parts_ttft = make_svg_parts(ni_values, batch_values, ttft_data, "time to first token : batch size")
     write_svg(ttft_svg_filepath, svg_parts_ttft)
 
     # ------------------------------------------------------------------
     # Produce speed (tok/sec) plot
     # ------------------------------------------------------------------
-    svg_parts_tok = make_svg_parts(ni_values, batch_values, tok_data)
+    svg_parts_tok = make_svg_parts(ni_values, batch_values, tok_data, "token/sec : batch size")
     write_svg(tok_svg_filepath, svg_parts_tok)
 
 # ----------------------------------------------------------------------
