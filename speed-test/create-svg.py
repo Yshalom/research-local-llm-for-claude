@@ -15,9 +15,15 @@ Two SVG files are produced:
 import csv
 import os
 import sys
+import argparse
 
 from numbers import Number
 from typing import Iterable
+
+# Color constants for terminal output
+RED = "\033[31m"
+YELLOW = "\033[33m"
+RESET = "\033[0m"
 
 # ----------------------------------------------------------------------
 # Configuration constants
@@ -28,8 +34,8 @@ COLOR_LIST = ['red', 'blue', 'green', 'purple', 'orange']
 DATA_START_IDX = 4                     # first Ni‑TTFT column index (0‑based)
 
 # SVG canvas size
-CANVAS_WIDTH = 900
-CANVAS_HEIGHT = 600
+CANVAS_WIDTH = 800
+CANVAS_HEIGHT = 800
 
 # Padding around the plot area (pixels)
 PADDING_LEFT = 80
@@ -47,15 +53,15 @@ AXIS_COLOR = "#777"
 AXIS_MARGIN_PERCENTAGE = .03 # 3%
 
 # Point appearance
-POINT_RADIUS = 3
+POINT_RADIUS = 5
 
 # Text appearance
-LABEL_FONT_SIZE = 14                   # series labels (top‑right)
+LABEL_FONT_SIZE = 16                   # series labels (top‑right)
 TICK_LABEL_FONT_SIZE = 12              # axis numbers
 LABEL_SPACING_VERT = 20                # vertical space between series labels
 LABEL_OFFSET_FROM_TOP = PADDING_TOP // 2
 LABEL_OFFSET_FROM_RIGHT = 10           # distance of label block from right edge
-TITLE_FONT_SIZE = 18                   # title font size
+TITLE_FONT_SIZE = 24                   # title font size
 TITLE_OFFSET_FROM_TOP = 30             # distance of title from top edge
 TITLE_COLOR = "blue"
 
@@ -92,16 +98,13 @@ def read_csv(filepath: str) -> \
             # Keep everything except the final line
             rows = list(reader)[:-1]
         except StopIteration:
-            print("CSV file is empty.")
-            sys.exit(1)
+            raise ValueError("CSV file is empty.")
 
     # Basic header validation
     if len(header) < 5:
-        print("Unexpected CSV header - the CSV must contains at least 5 columns.")
-        sys.exit(1)
+        raise ValueError("Unexpected CSV header - the CSV must contains at least 5 columns.")
     if header[0] != "Batch-Size":
-        print("Unexpected CSV header - first column must be 'Batch-Size'.")
-        sys.exit(1)
+        raise ValueError("Unexpected CSV header - first column must be 'Batch-Size'.")
 
     # Scan header for Ni-TTFT / Ni-tok/sec pairs
     ni_values = []  # keeps Ni strings in the order they appear (e.g. ['N1','N2',...])
@@ -110,29 +113,24 @@ def read_csv(filepath: str) -> \
         ttft_col = header[idx]
         if not ttft_col.endswith("-TTFT"):
             # If we meet something that is not a TTFT column we stop parsing
-            print(f"Error: Got unknown column: {ttft_col}, expected a TTFT values column")
-            sys.exit(1)
+            raise ValueError(f"Got unknown column: {ttft_col}, expected a TTFT values column")
         ni = "-".join(ttft_col.split("-")[:-1])  # get the 'N1' string
         # Verify the following column matches the tok/sec counterpart
         if idx + 1 >= len(header):
-            print(f"Missing tok/sec column for {ni}")
-            sys.exit(1)
+            raise ValueError(f"Missing tok/sec column for {ni}")
         tok_col = header[idx + 1]
         expected_tok = f"{ni}-tok/sec"
         if tok_col != expected_tok:
-            print(f"Expected column '{expected_tok}' but found '{tok_col}'")
-            sys.exit(1)
+            raise ValueError(f"Expected column '{expected_tok}' but found '{tok_col}'")
 
         ni_values.append(ni)
         idx += 2 # skip the pair we just processed
 
     if not ni_values:
-        print("No Ni-TTFT / Ni-tok/sec column pairs found.")
-        sys.exit(1)
+        raise ValueError("No Ni-TTFT / Ni-tok/sec column pairs found.")
 
     if len(ni_values) > len(COLOR_LIST):
-        print(f"Error: found {len(ni_values)} different Ni values, but only up to {len(COLOR_LIST)} are supported.")
-        sys.exit(1)
+        raise ValueError(f"found {len(ni_values)} different Ni values, but only up to {len(COLOR_LIST)} are supported.")
 
     # Prepare storage for each series
     batch_values = []
@@ -142,29 +140,28 @@ def read_csv(filepath: str) -> \
     for row_num, row in enumerate(rows, start=1):
         # empty or malformed line - skip with a warning
         if (not row or all(cell.strip() == '' for cell in row)) or len(row) < len(header):
-            print(f"Warning: line {row_num} has fewer columns than header - skipping.")
+            print(f"{YELLOW}Warning: line {row_num} has fewer columns than header - skipping.{RESET}")
             continue
 
         try:
             batch = int(row[0])
         except ValueError:
-            print(f"Warning: cannot parse Batch-Size on line {row_num} - skipping.")
+            print(f"{YELLOW}Warning: cannot parse Batch-Size on line {row_num} - skipping.{RESET}")
             continue
         batch_values.append(batch)
-        
-        # Walk through the Ni pairs and store the numbers
+
+        # Process the Ni-TTFT / Ni-tok/sec pairs for this row
         idx = DATA_START_IDX
         for ni in ni_values:
             try:
                 ttft = float(row[idx])
                 tok = float(row[idx + 1])
             except (ValueError, IndexError):
-                print(f"Warning: bad numeric value for {ni} on line {row_num} - skipping this row.")
+                print(f"{YELLOW}Warning: bad numeric value for {ni} on line {row_num} - skipping this row.{RESET}")
                 break # abort this row entirely
             ttft_data[ni, batch] = ttft
             tok_data[ni, batch] = tok
             idx += 2
-
     return tuple(ni_values), tuple(batch_values), ttft_data, tok_data
 
 
@@ -204,8 +201,7 @@ def compute_limits(axis_vals: Iterable[Number]) -> tuple[Number, Number]:
     `axis_vals` are iterables of numbers.
     """
     if not axis_vals:
-        print("ERROR: SVG limit computation: No data to compute limits.")
-        sys.exit(1)
+        raise ValueError("SVG limit computation: No data to compute limits.")
 
     min_val = min(axis_vals)
     max_val = max(axis_vals)
@@ -389,21 +385,41 @@ def csv2svg(csv_filepath: str, ttft_svg_filepath: str, tok_svg_filepath: str) ->
 # Main routine
 # ----------------------------------------------------------------------
 def main():
-    # # Ask user for CSV path
-    # csv_path = input("Enter path to CSV file: ")
-    # if not csv_path:
-    #     print("No file name supplied - exiting.")
-    #     sys.exit(1)
-    # if not os.path.isfile(csv_path):
-    #     print(f"File not found: {csv_path}")
-    #     sys.exit(1)
+    parser = argparse.ArgumentParser(description='Convert CSV files to SVG plots.')
+    parser.add_argument('root_dir', nargs='?', default='.', help='Root directory to search for CSV files (default: current directory)')
+    args = parser.parse_args()
 
-    # Test file
-    csv_path = "speed-test/NVIDIA-Nemotron-3-Nano-30B-A3B-Q4_K_M/KV-Cache-Q4_0/512k.csv"
+    root_dir = os.path.abspath(args.root_dir)
 
-    # Base name for output files (same directory, same stem as CSV)
-    base, _ = os.path.splitext(csv_path)
-    csv2svg(csv_path, f"{base}-ttft.svg", f"{base}-speed.svg")
+    # Walk the directory tree to find all .csv files
+    csv_files = []
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        for filename in filenames:
+            if filename.lower().endswith('.csv'):
+                full_path = os.path.join(dirpath, filename)
+                csv_files.append(full_path)
+
+    # Sort the files for consistent output
+    csv_files.sort()
+
+    for csv_file in csv_files:
+        # Print the relative path from root_dir
+        rel_path = os.path.relpath(csv_file, root_dir)
+        print(rel_path)
+
+        try:
+            # Base name for output files (same directory, same stem as CSV)
+            base, _ = os.path.splitext(csv_file)
+            ttft_svg = f"{base}-ttft.svg"
+            tok_svg = f"{base}-speed.svg"
+            csv2svg(csv_file, ttft_svg, tok_svg)
+            print("--- SVG images were created")
+        except ValueError as e:
+            print(f"{RED}--- ERROR: couldn't create SVG images because {e}{RESET}")
+        except Exception as e:
+            # Catch any other unexpected errors and print in red
+            print(f"{RED}--- ERROR: couldn't create SVG images because {e}{RESET}")
+        print()  # blank line after each file
 
 if __name__ == "__main__":
     main()
