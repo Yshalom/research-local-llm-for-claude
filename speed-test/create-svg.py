@@ -217,15 +217,8 @@ def compute_limits(axis_vals: Iterable[Number]) -> tuple[Number, Number]:
 # ----------------------------------------------------------------------
 
 def draw_grid_and_ticks(svg_parts: list[str], x_min: Number, x_max: Number, y_min: Number, y_max: Number, sx, sy) -> None:
-
-    def fmt_val(val: Number) -> str:
-        """Format a number for tick labels - drop trailing .0 when possible.  
-        Round up to 1 digit after the point.
-        """
-        s = f"{val:.1f}"
-        return s.rstrip('0').rstrip('.')
-
     """Add grid lines, tick marks and numeric axis labels."""
+    
     xticks = nice_ticks(x_min, x_max, NUM_TICKS)
     yticks = nice_ticks(y_min, y_max, NUM_TICKS)
 
@@ -245,11 +238,10 @@ def draw_grid_and_ticks(svg_parts: list[str], x_min: Number, x_max: Number, y_mi
             f'stroke="{AXIS_COLOR}" stroke-width="1"/>'
         )
         # x‑axis label
-        label = fmt_val(x_val)
         svg_parts.append(
             f'  <text x="{x_svg:.2f}" y="{sy(y_min) + TICK_SIZE + 12:.2f}" '
             f'text-anchor="middle" font-family="sans-serif" '
-            f'font-size="{TICK_LABEL_FONT_SIZE}" fill="{AXIS_COLOR}">{label}</text>'
+            f'font-size="{TICK_LABEL_FONT_SIZE}" fill="{AXIS_COLOR}">{round(x_val)}</text>'
         )
 
     # Horizontal grid lines & y‑axis ticks / labels
@@ -268,11 +260,10 @@ def draw_grid_and_ticks(svg_parts: list[str], x_min: Number, x_max: Number, y_mi
             f'stroke="{AXIS_COLOR}" stroke-width="1"/>'
         )
         # y‑axis label
-        label = fmt_val(y_val)
         svg_parts.append(
             f'  <text x="{sx(x_min) - TICK_SIZE - 4:.2f}" y="{y_svg + 4:.2f}" '
             f'text-anchor="end" font-family="sans-serif" '
-            f'font-size="{TICK_LABEL_FONT_SIZE}" fill="{AXIS_COLOR}">{label}</text>'
+            f'font-size="{TICK_LABEL_FONT_SIZE}" fill="{AXIS_COLOR}">{y_val:.2f}</text>'
         )
 
 def draw_axes(svg_parts: list[str], x_min: Number, x_max: Number, y_min: Number, y_max: Number, sx, sy) -> None:
