@@ -1,0 +1,4 @@
+Batch-Size, Exports on CPU, RAM, VRAM, 1k-TTFT, 1k-tok/sec, 125k-TTFT, 125k-tok/sec, 250k-TTFT, 250k-tok/sec, 375k-TTFT, 375k-tok/sec
+1536,87,61.9,14.8,0.9,16,283.7,15.5,579.8,15,897.8,14.8
+2048,88,62.3,15.3,0.9,15.7,230.4,15.4,471,15.2,738.4,14.9
+3072,VRAM overload,,,,,,,,,,
