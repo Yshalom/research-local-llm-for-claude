@@ -292,16 +292,33 @@ def draw_series(svg_parts: list[str], ni_values: tuple[str], batch_values: tuple
     """
     Plot the field's values for all the series (each series gets a unique color
     according to COLOR_LIST).  
-    Each value is drawn as a point (draw small circle).
+    Each value is drawn as a point (draw small circle).  
+    Lines are drawn connecting consecutive points for better visibility.
     """
     for idx, ni in enumerate(ni_values):
         color = COLOR_LIST[idx]
+        points = []  # Store (x, y) coordinates for this series
+
+        # Collect points for this series in order of batch values
         for batch in batch_values:
             cx, cy = sx(batch), sy(data[ni, batch])
+            points.append((cx, cy))
+            # Draw the point
             svg_parts.append(
                 f'  <circle cx="{cx:.2f}" cy="{cy:.2f}" r="{POINT_RADIUS}" '
                 f'fill="{color}"/>'
             )
+
+        # Draw lines connecting consecutive points
+        if len(points) > 1:
+            for i in range(len(points) - 1):
+                x1, y1 = points[i]
+                x2, y2 = points[i + 1]
+                svg_parts.append(
+                    f'  <line x1="{x1:.2f}" y1="{y1:.2f}" '
+                    f'x2="{x2:.2f}" y2="{y2:.2f}" '
+                    f'stroke="{color}" stroke-width="1"/>'
+                )
 
 def draw_labels(svg_parts: list[str], labels, label_x, label_y_start, label_spacing):
     """Add the series labels (Ni) in the top-right corner."""
