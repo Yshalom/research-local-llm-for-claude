@@ -36,7 +36,7 @@ The proxy's behavior is governed by a JSON configuration file (`proxy-settings.j
 To integrate the proxy into LM-Studio as a backend engine, it is necessary to provide a complete set of artifacts that satisfy LM-Studio's backend requirements. 
 
 ### Backend Directory Structure
-The project is structured such that multiple backends can exist in the "backend" directory (each one in its own sub-directory). The specific implementation for this project resides within:
+The project is structured such that multiple backends can exist in the "backends" directory (each one in its own sub-directory). The specific implementation for this project resides within:
 `backends/llama.cpp-win-x86_64-nvidia-cuda12-avx2-2.27.1-proxy`
 
 This folder contains the proxy and its configuration, which points to the original `llama.cpp` server located in the sibling directory:
