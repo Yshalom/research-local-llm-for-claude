@@ -1,0 +1,35 @@
+{
+  "forward to": "..\llama.cpp-win-x86_64-nvidia-cuda12-avx2-2.27.1\llama-server.exe",
+  "replace": [
+    {
+      "from": "--spec-type",
+      "from-value": "draft-simple",
+      "to-value": "draft-mtp",
+      "when": [
+        {
+          "arg": "--model",
+          "value": "D:\.lmstudio\models\lmstudio-community\gemma-4-12B-it-GGUF\gemma-4-12B-it-Q6_K.gguf"
+        },
+        {
+          "arg": "--spec-draft-model",
+          "value": "D:\.lmstudio\models\lmstudio-community\gemma-4-12B-it-assistant-GGUF\gemma-4-12B-it-assistant-Q8_0.gguf"
+        }
+      ]
+    },
+    {
+      "from": "--spec-type",
+      "from-value": "draft-simple",
+      "to-value": "draft-mtp",
+      "when": [
+        {
+          "arg": "--model",
+          "value": "D:\.lmstudio\models\lmstudio-community\gemma-4-12B-it-GGUF\gemma-4-12B-it-Q6_K.gguf"
+        },
+        {
+          "arg": "--spec-draft-model",
+          "value": "D:\.lmstudio\models\lmstudio-community\gemma-4-12B-it-assistant-GGUF\gemma-4-12B-it-assistant-FP16.gguf"
+        }
+      ]
+    }
+  ]
+}
