@@ -35,13 +35,20 @@ The proxy's behavior is governed by a JSON configuration file (`proxy-settings.j
 
 To integrate the proxy into LM-Studio as a backend engine, it is necessary to provide a complete set of artifacts that satisfy LM-Studio's backend requirements. 
 
+### Backend Directory Structure
+The project is structured such that multiple backends can exist in the "backend" directory (each one in its own sub-directory). The specific implementation for this project resides within:
+`backends/llama.cpp-win-x86_64-nvidia-cuda12-avx2-2.27.1-proxy`
+
+This folder contains the proxy and its configuration, which points to the original `llama.cpp` server located in the sibling directory:
+`backends/llama.cpp-win-x86_64-nvidia-cuda12-avx2-2.27.1`
+
 ### Required Files
-The following files must exist in the `backends` directory:
+The following files must exist within the **proxy** folder:
 
 | File | Description | Source/Status |
 | :--- | :--- | :--- |
 | **`llama-server.exe`** | **The Proxy Executable.** The core compiled binary that handles interception and forwarding. | **New / Compiled** |
-| **`proxy-settings.json`** | **Proxy Configuration.** Defines the forward path and semantic replacement rules (including MTP logic). | **New** |
+| **`proxy-settings.json`** | **Proxy Configuration.** Defines the forward path to the original `llama.cpp` server and semantic replacement rules (including MTP logic). | **New** |
 | `backend-manifest.json` | Metadata describing the backend engine to LM-Studio. | Copied & Modified |
 | `display-data.json` | UI metadata for display names and descriptions. | Copied & Modified |
 | `lmstudiocore.dll` | Core binding library for LM-Studio. | Original |
@@ -52,7 +59,7 @@ The following files must exist in the `backends` directory:
 ### Setup Procedure & Modifications
 The following specific modifications are required during the setup:
 
-1.  **Backend Placement**: Place all files listed in the table above into the LM-Studio `backends` directory.
+1.  **Backend Placement**: Place all files listed in the table above into the proxy-specific backend folder.
 2.  **Manifest Modification**: Update the `"name"` property in `backend-manifest.json`:
     *   *Original*: `"name": "llama.cpp-win-x86_64-nvidia-cuda12-avx2"`
     *   *Modified*: `"name": "llama.cpp-win-x86_64-nvidia-cuda12-avx2-proxy"`
@@ -61,7 +68,7 @@ The following specific modifications are required during the setup:
     *   *Modified displayName*: `"CUDA 12 llama.cpp (Windows) Proxy"`
     *   *Original description*: `"Nvidia CUDA 12.8 accelerated llama.cpp engine"`
     *   *Modified description*: `"Nvidia CUDA 12.8 accelerated llama.cpp engine proxy"`
-4.  **Runtime Configuration**: Configure `proxy-settings.json` to point to your local `llama.cpp` installation and define the specific model path triggers for Gemma-4.
+4.  **Runtime Configuration**: Configure `proxy-settings.json` to point to the correct path of the original `llama-server.exe` and define the specific model path triggers for Gemma-4.
 
 ---
 
