@@ -1,0 +1,17 @@
+If not said otherwise, all the tests are preformed with:
+--------------------------------------------------------
+GPU Offload: full
+CPU Thread Pool Size: 8
+Evaluation Batch Size = Physical Batch Size
+Max Concurrent Predictions: 1
+Unified KV Cache: off
+Context Checkpoints: 0
+RoPE Frequency Base: Auto
+RoPE Frequency Scale: Auto
+Offload KV Cache to GPU Memory: on
+Keep Model in Memory: on
+Try mmap(): on
+Seed: Random Seed
+Chat Template: default
+Flash Attention: on
+Limit Response Length: 1000

@@ -1,0 +1,15 @@
+All the tests are preformed with:
+---------------------------------
+Batch Size: 512
+Min Draft Tokens: 0
+Draft Probability: 0.75
+
+Resource Monitoring:
+--------------------
+RAM usage, VRAM usage, and TTFT are not measured for those tests
+KV Cache isn't quantize [FP16]
+Context Length: 256k
+Assistant model is quantize to Q8_0
+Acceptance is in percentage
+Context Checkpoints: 1
+The value is an average of 5 samples (accounting for the MTP having some random properties)
