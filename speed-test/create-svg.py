@@ -2,21 +2,24 @@
 CSV -> SVG plotter (two separate plots)
 
 Expected CSV format (first line = header):
-    Batch-Size, Exports on CPU, RAM, VRAM, N1-TTFT, N1-tok/sec, N2-TTFT, N2-tok/sec, ...
+    <X-axis column>, <Ni-field-1>, <Ni-field-2>, …
+where the X-axis column is in VALID_X_AXIS (a list of valid names for the column),
+and each subsequent column follows the pattern "<Ni>-<suffix>".
+The suffix is looked up in ``Y_AXIS_MAP`` to determine which
+y-field the column belongs to (e.g. "ttft", "speed", "acceptance").
 
-Only the columns Batch-Size and the Ni-TTFT / Ni-tok/sec pairs are used.
-The last line of the file is ignored (usually a line with a Batch-Size value, and why can't the model run with it).
+Only the columns that match ``Y_AXIS_MAP`` are used.
+The last line of the file is ignored (usually a reason for stopping the test).
 
-Two SVG files are produced:
-    <basename>-ttft.svg   : TTFT values only
-    <basename>-speed.svg  : tok/sec (speed) values only
+Two (or more) SVG files are produced for each y-field:
+    <basename>-<graph_name>.svg
+where ``graph_name`` comes from ``GRAPH_NAME_MAP``.
 """
 
 import csv
 import os
 import sys
 import argparse
-
 from numbers import Number
 from typing import Iterable
 
@@ -30,8 +33,17 @@ RESET = "\033[0m"
 # ----------------------------------------------------------------------
 COLOR_LIST = ['red', 'blue', 'green', 'purple', 'orange']
 
-# CSV layout
-DATA_START_IDX = 4                     # first Ni‑TTFT column index (0‑based)
+# X-axis column names that are accepted
+VALID_X_AXIS = {"Batch-Size", "Max Draft Tokens"}
+
+# Mapping from canonical y-field name to the name used for the SVG file
+GRAPH_NAME_MAP = {
+    "TTFT": "ttft",
+    "tok/sec": "speed",
+    "acceptance": "acceptance",
+    # extend here for additional y-fields
+}
+VALID_Y_AXIS = list(GRAPH_NAME_MAP.keys())
 
 # SVG canvas size
 CANVAS_WIDTH = 800
@@ -44,25 +56,25 @@ PADDING_TOP = 60
 PADDING_BOTTOM = 60
 
 # Axis & grid appearance
-NUM_TICKS = 15                         # how many tick marks per axis
-TICK_SIZE = 4                          # length of tick marks (pixels)
+NUM_TICKS = 15
+TICK_SIZE = 4
 GRID_STROKE_WIDTH = 1
 GRID_COLOR = "#ddd"
 AXIS_STROKE_WIDTH = 2
 AXIS_COLOR = "#777"
-AXIS_MARGIN_PERCENTAGE = .03 # 3%
+AXIS_MARGIN_PERCENTAGE = .03
 
 # Point appearance
 POINT_RADIUS = 5
 
 # Text appearance
-LABEL_FONT_SIZE = 16                   # series labels (top‑right)
-TICK_LABEL_FONT_SIZE = 12              # axis numbers
-LABEL_SPACING_VERT = 20                # vertical space between series labels
+LABEL_FONT_SIZE = 16
+TICK_LABEL_FONT_SIZE = 12
+LABEL_SPACING_VERT = 20
 LABEL_OFFSET_FROM_TOP = PADDING_TOP // 2
-LABEL_OFFSET_FROM_RIGHT = 10           # distance of label block from right edge
-TITLE_FONT_SIZE = 24                   # title font size
-TITLE_OFFSET_FROM_TOP = 30             # distance of title from top edge
+LABEL_OFFSET_FROM_RIGHT = 10
+TITLE_FONT_SIZE = 24
+TITLE_OFFSET_FROM_TOP = 30
 TITLE_COLOR = "blue"
 
 # SVG overall layout
@@ -74,20 +86,19 @@ SVG_TAIL_STR = "</svg>"
 # CSV reading & preprocessing
 # ----------------------------------------------------------------------
 
+
 def read_csv(filepath: str) -> \
     tuple[
-        tuple[str],
-        tuple[int],
-        dict[(str, int), float],
-        dict[(str, int), float],
+        tuple[str],                     # ni_values
+        tuple[int],                     # x_values
+        dict[str, dict[(str, int), float]],  # data: {y_field: {(ni, x): y}}
     ]:
     """
-    Read the CSV, discard the ignored columns and the final empty line.  
-    return:  
-        - ni_values: list of Ni strings in the order they appear  
-        - batch_values: list of the batch values in the order they appear  
-        - ttft_data: dict { (Ni, batch) -> ttft }  
-        - tok_data: dict { (Ni, batch) -> tok/sec }  
+    Read the CSV, discard ignored columns and the final empty line.
+    Returns:
+        - ni_values: tuple of Ni strings in order of appearance
+        - x_values: tuple of x values (int) in order of appearance
+        - data: dict mapping each y-field name to a dict {(ni, x) -> y}
     """
 
     # open and read the CSV file
@@ -101,73 +112,89 @@ def read_csv(filepath: str) -> \
             raise ValueError("CSV file is empty.")
 
     # Basic header validation
-    if len(header) < 5:
-        raise ValueError("Unexpected CSV header - the CSV must contains at least 5 columns.")
-    if header[0] != "Batch-Size":
-        raise ValueError("Unexpected CSV header - first column must be 'Batch-Size'.")
+    if not header:
+        raise ValueError("CSV header is empty.")
+    if header[0] not in VALID_X_AXIS:
+        raise ValueError(f"First column must be one of {VALID_X_AXIS}, got '{header[0]}'.")
 
-    # Scan header for Ni-TTFT / Ni-tok/sec pairs
-    ni_values = []  # keeps Ni strings in the order they appear (e.g. ['N1','N2',...])
-    idx = DATA_START_IDX
-    while idx < len(header):
-        ttft_col = header[idx]
-        if not ttft_col.endswith("-TTFT"):
-            # If we meet something that is not a TTFT column we stop parsing
-            raise ValueError(f"Got unknown column: {ttft_col}, expected a TTFT values column")
-        ni = "-".join(ttft_col.split("-")[:-1])  # get the 'N1' string
-        # Verify the following column matches the tok/sec counterpart
-        if idx + 1 >= len(header):
-            raise ValueError(f"Missing tok/sec column for {ni}")
-        tok_col = header[idx + 1]
-        expected_tok = f"{ni}-tok/sec"
-        if tok_col != expected_tok:
-            raise ValueError(f"Expected column '{expected_tok}' but found '{tok_col}'")
+    # ---- discover Ni-field columns -----------------------------------------
+    ni_values: list[str] = []
+    # Mapping: y_field -> {ni -> column index}
+    yfield_to_ni_indices: dict[str, dict[str, int]] = {}
 
-        ni_values.append(ni)
-        idx += 2 # skip the pair we just processed
+    for idx in range(1, len(header)):  # skip the first column (x-axis)
+        col = header[idx]
+        parts = col.split('-')
+        if len(parts) < 2:
+            continue  # not in "<Ni>-<suffix>" form
+        ni = '-'.join(parts[:-1])
+        suffix = parts[-1]
+
+        if suffix not in VALID_Y_AXIS:
+            # ignore columns we don't have a mapping for
+            continue
+
+        # Ensure we have a mapping for this y-field
+        if suffix not in yfield_to_ni_indices:
+            yfield_to_ni_indices[suffix] = {}
+
+        if ni in yfield_to_ni_indices[suffix]:
+            raise ValueError(f"Duplicate column for ni='{ni}' in y-field='{suffix}'.")
+        yfield_to_ni_indices[suffix][ni] = idx
+
+        # Collect ni values once
+        if ni not in ni_values:
+            ni_values.append(ni)
 
     if not ni_values:
-        raise ValueError("No Ni-TTFT / Ni-tok/sec column pairs found.")
+        raise ValueError("No recognized Ni-field columns found (expected suffixes: "
+                         + ", ".join(VALID_Y_AXIS) + ").")
 
-    if len(ni_values) > len(COLOR_LIST):
-        raise ValueError(f"found {len(ni_values)} different Ni values, but only up to {len(COLOR_LIST)} are supported.")
+    if not yfield_to_ni_indices:
+        raise ValueError("No columns matched known suffixes in Y_AXIS_MAP.")
 
-    # Prepare storage for each series
-    batch_values = []
-    ttft_data: dict[(str, int), float] = {}
-    tok_data: dict[(str, int), float] = {}
+    # ---- parse rows ---------------------------------------------------------
+    # Prepare storage: for each y-field, a dict {(ni, x) -> float}
+    data: dict[str, dict[(str, int), float]] = {
+        y_field: {} for y_field in yfield_to_ni_indices.keys()
+    }
+
+    x_values: list[int] = []
 
     for row_num, row in enumerate(rows, start=1):
-        # empty or malformed line - skip with a warning
+        # Skip empty/malformed lines
         if (not row or all(cell.strip() == '' for cell in row)) or len(row) < len(header):
             print(f"{YELLOW}Warning: line {row_num} has fewer columns than header - skipping.{RESET}")
             continue
 
+        # Parse x value (first column)
         try:
-            batch = int(row[0])
+            x = int(row[0])
         except ValueError:
-            print(f"{YELLOW}Warning: cannot parse Batch-Size on line {row_num} - skipping.{RESET}")
+            print(f"{YELLOW}Warning: cannot parse X value on line {row_num} - skipping.{RESET}")
             continue
-        batch_values.append(batch)
+        x_values.append(x)
 
-        # Process the Ni-TTFT / Ni-tok/sec pairs for this row
-        idx = DATA_START_IDX
-        for ni in ni_values:
-            try:
-                ttft = float(row[idx])
-                tok = float(row[idx + 1])
-            except (ValueError, IndexError):
-                print(f"{YELLOW}Warning: bad numeric value for {ni} on line {row_num} - skipping this row.{RESET}")
-                break # abort this row entirely
-            ttft_data[ni, batch] = ttft
-            tok_data[ni, batch] = tok
-            idx += 2
-    return tuple(ni_values), tuple(batch_values), ttft_data, tok_data
+        # Parse each y-field's columns
+        for y_field, ni_to_idx in yfield_to_ni_indices.items():
+            ni_data = data[y_field]
+            for ni, col_idx in ni_to_idx.items():
+                try:
+                    val = float(row[col_idx])
+                except (ValueError, IndexError):
+                    print(f"{YELLOW}Warning: bad numeric value for {ni} on line {row_num} - skipping this row.{RESET}")
+                    # Abort this row entirely – we don't have complete data for it
+                    break
+                ni_data[(ni, x)] = val
+
+    # Convert to immutable tuples for the caller
+    return tuple(ni_values), tuple(x_values), data
 
 
 # ----------------------------------------------------------------------
-# Prepare SVG scaling helpers
+# Scaling helpers
 # ----------------------------------------------------------------------
+
 
 def make_scaling(x_min: Number, x_max: Number, y_min: Number, y_max: Number):
     """Return scaling-x, scaling-y functions for the given limits.
@@ -206,7 +233,7 @@ def compute_limits(axis_vals: Iterable[Number]) -> tuple[Number, Number]:
     min_val = min(axis_vals)
     max_val = max(axis_vals)
 
-    # 10% margin
+    # margin
     axis_range = max_val - min_val
     margin = AXIS_MARGIN_PERCENTAGE * axis_range
 
@@ -279,7 +306,7 @@ def draw_axes(svg_parts: list[str], x_min: Number, x_max: Number, y_min: Number,
         f'stroke="{AXIS_COLOR}" stroke-width="{AXIS_STROKE_WIDTH}"/>'
     )  # Y‑axis
 
-def draw_series(svg_parts: list[str], ni_values: tuple[str], batch_values: tuple[int], data: dict[(str, int), float], sx, sy) -> None:
+def draw_series(svg_parts: list[str], ni_values: tuple[str], x_values: tuple[int], data: dict[(str, int), float], sx, sy) -> None:
     """
     Plot the field's values for all the series (each series gets a unique color
     according to COLOR_LIST).  
@@ -290,9 +317,9 @@ def draw_series(svg_parts: list[str], ni_values: tuple[str], batch_values: tuple
         color = COLOR_LIST[idx]
         points = []  # Store (x, y) coordinates for this series
 
-        # Collect points for this series in order of batch values
-        for batch in batch_values:
-            cx, cy = sx(batch), sy(data[ni, batch])
+        # Collect points for this series in order of x values
+        for x in x_values:
+            cx, cy = sx(x), sy(data[ni, x])
             points.append((cx, cy))
             # Draw the point
             svg_parts.append(
@@ -312,16 +339,13 @@ def draw_series(svg_parts: list[str], ni_values: tuple[str], batch_values: tuple
                 )
 
 def draw_labels(svg_parts: list[str], labels, label_x, label_y_start, label_spacing):
-    """Add the series labels (Ni) in the top-right corner."""
+    """Add series labels (Ni) in the top-right corner."""
     for idx, ni in enumerate(labels):
-        label_text = f"{ni}"
-        color = COLOR_LIST[idx]
         label_y = label_y_start + idx * label_spacing
         svg_parts.append(
             f'  <text x="{label_x}" y="{label_y}" '
             f'font-family="sans-serif" font-size="{LABEL_FONT_SIZE}" '
-            f'fill="{color}">{label_text}</text>'
-        )
+            f'fill="{COLOR_LIST[idx]}">{ni}</text>')
 
 def draw_rectangle(svg_parts: list[str], width, height, color) -> None:
     svg_parts.append(f'<rect width="{width}" height="{height}" fill="{color}"/>')
@@ -330,21 +354,19 @@ def draw_title(svg_parts: list[str], title: str, title_x, title_y, color) -> Non
     svg_parts.append(
         f'  <text x="{title_x}" y="{title_y}" '
         f'text-anchor="middle" font-family="sans-serif" '
-        f'font-size="{TITLE_FONT_SIZE}" fill="{color}">{title}</text>'
-    )
-
+        f'font-size="{TITLE_FONT_SIZE}" fill="{color}">{title}</text>')
 
 # ----------------------------------------------------------------------
 # SVG creation functions
 # ----------------------------------------------------------------------
 
-def make_svg_parts(ni_values: tuple[str], batch_values: tuple[int], data: dict[(str, int), float], title: str) -> list[str]:
+def make_svg_parts(ni_values: tuple[str], x_values: tuple[int], data: dict[(str, int), float], title: str) -> list[str]:
     # Produce plot's parts list
-    x_min, x_max = compute_limits(batch_values)
+    x_min, x_max = compute_limits(x_values)
     y_min, y_max = compute_limits(data.values())
     scaling_x_func, scaling_y_func = make_scaling(x_min, x_max, y_min, y_max)
 
-    svg_parts = []
+    svg_parts: list[str] = []
     svg_parts.append(SVG_HEADER_STR)
 
     if SVG_BACKGROUND:
@@ -354,13 +376,14 @@ def make_svg_parts(ni_values: tuple[str], batch_values: tuple[int], data: dict[(
 
     draw_grid_and_ticks(svg_parts, x_min, x_max, y_min, y_max, scaling_x_func, scaling_y_func)
     draw_axes(svg_parts, x_min, x_max, y_min, y_max, scaling_x_func, scaling_y_func)
-    draw_series(svg_parts, ni_values, batch_values, data, scaling_x_func, scaling_y_func)
+    draw_series(svg_parts, ni_values, x_values, data, scaling_x_func, scaling_y_func)
 
+    # Labels for Ni series (top-right)
     label_x = CANVAS_WIDTH - PADDING_RIGHT - LABEL_OFFSET_FROM_RIGHT
     label_y_start = LABEL_OFFSET_FROM_TOP
     draw_labels(svg_parts, ni_values, label_x, label_y_start, LABEL_SPACING_VERT)
-    svg_parts.append(SVG_TAIL_STR)
 
+    svg_parts.append(SVG_TAIL_STR)
     return svg_parts
 
 def write_svg(filepath: str, svg_parts: list[str]) -> None:
@@ -373,27 +396,30 @@ def write_svg(filepath: str, svg_parts: list[str]) -> None:
         print(f"Failed to write SVG file: {e}")
         sys.exit(1)
 
-def csv2svg(csv_filepath: str, ttft_svg_filepath: str, tok_svg_filepath: str) -> None:
-    # Load CSV and extract series / data
-    ni_values, batch_values, ttft_data, tok_data = read_csv(csv_filepath)
 
-    # ------------------------------------------------------------------
-    # Produce TTFT plot
-    # ------------------------------------------------------------------
-    svg_parts_ttft = make_svg_parts(ni_values, batch_values, ttft_data, "time to first token : batch size")
-    write_svg(ttft_svg_filepath, svg_parts_ttft)
+def csv2svg(csv_filepath: str) -> None:
+    """
+    Create an SVG file for each y-field defined in ``data``.
+    """
+    # Parse CSV once
+    ni_values, x_values, data = read_csv(csv_filepath)
 
-    # ------------------------------------------------------------------
-    # Produce speed (tok/sec) plot
-    # ------------------------------------------------------------------
-    svg_parts_tok = make_svg_parts(ni_values, batch_values, tok_data, "token/sec : batch size")
-    write_svg(tok_svg_filepath, svg_parts_tok)
+    base, _ = os.path.splitext(csv_filepath)
+
+    for y_field, y_data in data.items():
+        graph_name = GRAPH_NAME_MAP[y_field]
+        out_path = base + '-' + graph_name + '.svg'
+        svg_parts = make_svg_parts(ni_values, x_values, y_data, y_field)
+        write_svg(out_path, svg_parts)
+
 
 # ----------------------------------------------------------------------
 # Main routine
 # ----------------------------------------------------------------------
+
+
 def main():
-    parser = argparse.ArgumentParser(description='Convert CSV files to SVG plots.')
+    parser = argparse.ArgumentParser(description='Convert CSV files to SVG plots (multiple y-fields).')
     parser.add_argument('root_dir', nargs='?', default='.', help='Root directory to search for CSV files (default: current directory)')
     args = parser.parse_args()
 
@@ -407,25 +433,20 @@ def main():
                 full_path = os.path.join(dirpath, filename)
                 csv_files.append(full_path)
 
-    # Sort the files for consistent output
+    # Sort for deterministic output
     csv_files.sort()
 
     for csv_file in csv_files:
-        # Print the relative path from root_dir
         rel_path = os.path.relpath(csv_file, root_dir)
         print(rel_path)
 
         try:
-            # Base name for output files (same directory, same stem as CSV)
-            base, _ = os.path.splitext(csv_file)
-            ttft_svg = f"{base}-ttft.svg"
-            tok_svg = f"{base}-speed.svg"
-            csv2svg(csv_file, ttft_svg, tok_svg)
+            # Generate SVGs
+            csv2svg(csv_file)
             print("--- SVG images were created")
         except ValueError as e:
             print(f"{RED}--- ERROR: couldn't create SVG images because {e}{RESET}")
         except Exception as e:
-            # Catch any other unexpected errors and print in red
             print(f"{RED}--- ERROR: couldn't create SVG images because {e}{RESET}")
         print()  # blank line after each file
 
