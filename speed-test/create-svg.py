@@ -2,7 +2,7 @@
 CSV -> SVG plotter (two separate plots)
 
 Expected CSV format (first line = header):
-    <X-axis column>, <Ni-field-1>, <Ni-field-2>, …
+    <X-axis column>, <Ni-field-1>, <Ni-field-2>, ...
 where the X-axis column is in VALID_X_AXIS (a list of valid names for the column),
 and each subsequent column follows the pattern "<Ni>-<suffix>".
 The suffix is looked up in ``Y_AXIS_MAP`` to determine which
@@ -76,6 +76,10 @@ LABEL_OFFSET_FROM_RIGHT = 10
 TITLE_FONT_SIZE = 24
 TITLE_OFFSET_FROM_TOP = 30
 TITLE_COLOR = "blue"
+POINT_COORDINATES_LABEL_FONT_SIZE = 12
+POINT_COORDINATES_LABEL_X_OFFSET = -30
+POINT_COORDINATES_LABEL_Y_OFFSET = 4
+POINT_COORDINATES_LABEL_Y_INDEX_OFFSET = 14
 
 # SVG overall layout
 SVG_BACKGROUND = None
@@ -83,15 +87,35 @@ SVG_HEADER_STR = f'<svg width="{CANVAS_WIDTH}" height="{CANVAS_HEIGHT}" xmlns="h
 SVG_TAIL_STR = "</svg>"
 
 # ----------------------------------------------------------------------
+# Helper: format numbers with at least 4 digit precision
+# ----------------------------------------------------------------------
+def format_val(v: float) -> str:
+    """Format a number with at least 4 digit precision.
+    - If the absolute value has 4+ digits (>=1000), render as integer.
+    - Otherwise, format with the appropriate number of decimal places to keep at least 4 significant digits, removing trailing zeros.
+    """
+    # Handle zero explicitly to avoid issues with digit counting
+    if v == 0:
+        return "0"
+    # Count digits before the decimal point in the absolute value
+    digits_before = len(str(int(abs(v))))
+    # Determine how many decimal places we need to reach at least 4 significant digits
+    decimals_needed = max(0, 4 - digits_before)
+    # Round to that many decimal places
+    rounded = round(v, decimals_needed)
+    # Format with fixed-point
+    s = f"{rounded:.{decimals_needed}f}"
+    # Remove trailing zeros and a trailing decimal point if any
+    return s.rstrip('0').rstrip('.')
+
+# ----------------------------------------------------------------------
 # CSV reading & preprocessing
 # ----------------------------------------------------------------------
-
-
 def read_csv(filepath: str) -> \
     tuple[
         tuple[str],                     # ni_values
         tuple[int],                     # x_values
-        dict[str, dict[(str, int), float]],  # data: {y_field: {(ni, x): y}}
+        dict[str, dict[(str, int), float]],  # data: {y_field: {(ni, x) -> y}}
     ]:
     """
     Read the CSV, discard ignored columns and the final empty line.
@@ -100,7 +124,6 @@ def read_csv(filepath: str) -> \
         - x_values: tuple of x values (int) in order of appearance
         - data: dict mapping each y-field name to a dict {(ni, x) -> y}
     """
-
     # open and read the CSV file
     with open(filepath, newline='', encoding='utf-8') as f:
         reader = csv.reader(f)
@@ -268,7 +291,7 @@ def draw_grid_and_ticks(svg_parts: list[str], x_min: Number, x_max: Number, y_mi
         svg_parts.append(
             f'  <text x="{x_svg:.2f}" y="{sy(y_min) + TICK_SIZE + 12:.2f}" '
             f'text-anchor="middle" font-family="sans-serif" '
-            f'font-size="{TICK_LABEL_FONT_SIZE}" fill="{AXIS_COLOR}">{round(x_val)}</text>'
+            f'font-size="{TICK_LABEL_FONT_SIZE}" fill="{AXIS_COLOR}">{format_val(x_val)}</text>'
         )
 
     # Horizontal grid lines & y‑axis ticks / labels
@@ -290,7 +313,7 @@ def draw_grid_and_ticks(svg_parts: list[str], x_min: Number, x_max: Number, y_mi
         svg_parts.append(
             f'  <text x="{sx(x_min) - TICK_SIZE - 4:.2f}" y="{y_svg + 4:.2f}" '
             f'text-anchor="end" font-family="sans-serif" '
-            f'font-size="{TICK_LABEL_FONT_SIZE}" fill="{AXIS_COLOR}">{y_val:.2f}</text>'
+            f'font-size="{TICK_LABEL_FONT_SIZE}" fill="{AXIS_COLOR}">{format_val(y_val)}</text>'
         )
 
 def draw_axes(svg_parts: list[str], x_min: Number, x_max: Number, y_min: Number, y_max: Number, sx, sy) -> None:
@@ -318,13 +341,20 @@ def draw_series(svg_parts: list[str], ni_values: tuple[str], x_values: tuple[int
         points = []  # Store (x, y) coordinates for this series
 
         # Collect points for this series in order of x values
-        for x in x_values:
+        for i, x in enumerate(x_values):
             cx, cy = sx(x), sy(data[ni, x])
             points.append((cx, cy))
             # Draw the point
             svg_parts.append(
                 f'  <circle cx="{cx:.2f}" cy="{cy:.2f}" r="{POINT_RADIUS}" '
                 f'fill="{color}"/>'
+            )
+            # Add coordinate label above the point
+            label_cx = cx + POINT_COORDINATES_LABEL_X_OFFSET
+            label_cy = cy + POINT_COORDINATES_LABEL_Y_OFFSET + POINT_COORDINATES_LABEL_Y_INDEX_OFFSET * (i % 2 * 2 - 1)
+            svg_parts.append(
+                f'  <text x="{label_cx}" y="{label_cy}" '
+                f'font-family="sans-serif" font-size="{POINT_COORDINATES_LABEL_FONT_SIZE}" fill="{color}">({x}, {format_val(data[ni, x])})</text>'
             )
 
         # Draw lines connecting consecutive points
@@ -355,6 +385,7 @@ def draw_title(svg_parts: list[str], title: str, title_x, title_y, color) -> Non
         f'  <text x="{title_x}" y="{title_y}" '
         f'text-anchor="middle" font-family="sans-serif" '
         f'font-size="{TITLE_FONT_SIZE}" fill="{color}">{title}</text>')
+
 
 # ----------------------------------------------------------------------
 # SVG creation functions
