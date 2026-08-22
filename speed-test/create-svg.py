@@ -268,48 +268,64 @@ def compute_limits(axis_vals: Iterable[Number]) -> tuple[Number, Number]:
 
 def draw_grid_and_ticks(svg_parts: list[str], x_min: Number, x_max: Number, y_min: Number, y_max: Number, sx, sy) -> None:
     """Add grid lines, tick marks and numeric axis labels."""
-    
+
     xticks = nice_ticks(x_min, x_max, NUM_TICKS)
     yticks = nice_ticks(y_min, y_max, NUM_TICKS)
 
-    # Vertical grid lines & x‑axis ticks / labels
+    # Vertical grid lines as a single path
+    v_grid_paths = []
+    v_tick_paths = []
     for x_val in xticks:
         x_svg = sx(x_val)
         # grid line
-        svg_parts.append(
-            f'  <line x1="{x_svg:.2f}" y1="{sy(y_min):.2f}" '
-            f'x2="{x_svg:.2f}" y2="{sy(y_max):.2f}" '
-            f'stroke="{GRID_COLOR}" stroke-width="{GRID_STROKE_WIDTH}"/>'
-        )
+        v_grid_paths.append(f"{x_svg:.2f},{sy(y_min):.2f} {x_svg:.2f},{sy(y_max):.2f}")
         # tick mark (below axis)
+        v_tick_paths.append(f"{x_svg:.2f},{sy(y_min):.2f} {x_svg:.2f},{sy(y_min) + TICK_SIZE:.2f}")
+
+    if v_grid_paths:
         svg_parts.append(
-            f'  <line x1="{x_svg:.2f}" y1="{sy(y_min):.2f}" '
-            f'x2="{x_svg:.2f}" y2="{sy(y_min) + TICK_SIZE:.2f}" '
-            f'stroke="{AXIS_COLOR}" stroke-width="1"/>'
+            f'  <path d="M {" M ".join(v_grid_paths)}" '
+            f'stroke="{GRID_COLOR}" stroke-width="{GRID_STROKE_WIDTH}" fill="none"/>'
         )
-        # x‑axis label
+    if v_tick_paths:
+        svg_parts.append(
+            f'  <path d="M {" M ".join(v_tick_paths)}" '
+            f'stroke="{AXIS_COLOR}" stroke-width="1" fill="none"/>'
+        )
+
+    # x-axis labels
+    for x_val in xticks:
+        x_svg = sx(x_val)
         svg_parts.append(
             f'  <text x="{x_svg:.2f}" y="{sy(y_min) + TICK_SIZE + 12:.2f}" '
             f'text-anchor="middle" font-family="sans-serif" '
             f'font-size="{TICK_LABEL_FONT_SIZE}" fill="{AXIS_COLOR}">{format_val(x_val)}</text>'
         )
 
-    # Horizontal grid lines & y‑axis ticks / labels
+    # Horizontal grid lines as a single path
+    h_grid_paths = []
+    h_tick_paths = []
     for y_val in yticks:
         y_svg = sy(y_val)
         # grid line
-        svg_parts.append(
-            f'  <line x1="{sx(x_min):.2f}" y1="{y_svg:.2f}" '
-            f'x2="{sx(x_max):.2f}" y2="{y_svg:.2f}" '
-            f'stroke="{GRID_COLOR}" stroke-width="{GRID_STROKE_WIDTH}"/>'
-        )
+        h_grid_paths.append(f"{sx(x_min):.2f},{y_svg:.2f} {sx(x_max):.2f},{y_svg:.2f}")
         # tick mark (left of axis)
+        h_tick_paths.append(f"{sx(x_min) - TICK_SIZE:.2f},{y_svg:.2f} {sx(x_min):.2f},{y_svg:.2f}")
+
+    if h_grid_paths:
         svg_parts.append(
-            f'  <line x1="{sx(x_min) - TICK_SIZE:.2f}" y1="{y_svg:.2f}" '
-            f'x2="{sx(x_min):.2f}" y2="{y_svg:.2f}" '
-            f'stroke="{AXIS_COLOR}" stroke-width="1"/>'
+            f'  <path d="M {" M ".join(h_grid_paths)}" '
+            f'stroke="{GRID_COLOR}" stroke-width="{GRID_STROKE_WIDTH}" fill="none"/>'
         )
-        # y‑axis label
+    if h_tick_paths:
+        svg_parts.append(
+            f'  <path d="M {" M ".join(h_tick_paths)}" '
+            f'stroke="{AXIS_COLOR}" stroke-width="1" fill="none"/>'
+        )
+
+    # y-axis labels
+    for y_val in yticks:
+        y_svg = sy(y_val)
         svg_parts.append(
             f'  <text x="{sx(x_min) - TICK_SIZE - 4:.2f}" y="{y_svg + 4:.2f}" '
             f'text-anchor="end" font-family="sans-serif" '
@@ -319,15 +335,9 @@ def draw_grid_and_ticks(svg_parts: list[str], x_min: Number, x_max: Number, y_mi
 def draw_axes(svg_parts: list[str], x_min: Number, x_max: Number, y_min: Number, y_max: Number, sx, sy) -> None:
     """Draw the main X and Y axes (over the grid/ticks)."""
     svg_parts.append(
-        f'  <line x1="{sx(x_min)}" y1="{sy(y_min)}" '
-        f'x2="{sx(x_max)}" y2="{sy(y_min)}" '
-        f'stroke="{AXIS_COLOR}" stroke-width="{AXIS_STROKE_WIDTH}"/>'
-    )  # X‑axis
-    svg_parts.append(
-        f'  <line x1="{sx(x_min)}" y1="{sy(y_min)}" '
-        f'x2="{sx(x_min)}" y2="{sy(y_max)}" '
-        f'stroke="{AXIS_COLOR}" stroke-width="{AXIS_STROKE_WIDTH}"/>'
-    )  # Y‑axis
+        f'  <path d="M {sx(x_min):.2f},{sy(y_min):.2f} L {sx(x_max):.2f},{sy(y_min):.2f} M {sx(x_min):.2f},{sy(y_min):.2f} L {sx(x_min):.2f},{sy(y_max):.2f}" '
+        f'stroke="{AXIS_COLOR}" stroke-width="{AXIS_STROKE_WIDTH}" fill="none"/>'
+    )
 
 def draw_series(svg_parts: list[str], ni_values: tuple[str], x_values: tuple[int], data: dict[(str, int), float], sx, sy) -> None:
     """
@@ -357,16 +367,12 @@ def draw_series(svg_parts: list[str], ni_values: tuple[str], x_values: tuple[int
                 f'font-family="sans-serif" font-size="{POINT_COORDINATES_LABEL_FONT_SIZE}" fill="{color}">({x}, {format_val(data[ni, x])})</text>'
             )
 
-        # Draw lines connecting consecutive points
+        # Draw lines connecting consecutive points as a single polyline
         if len(points) > 1:
-            for i in range(len(points) - 1):
-                x1, y1 = points[i]
-                x2, y2 = points[i + 1]
-                svg_parts.append(
-                    f'  <line x1="{x1:.2f}" y1="{y1:.2f}" '
-                    f'x2="{x2:.2f}" y2="{y2:.2f}" '
-                    f'stroke="{color}" stroke-width="1"/>'
-                )
+            points_str = " ".join([f"{x:.2f},{y:.2f}" for x, y in points])
+            svg_parts.append(
+                f'  <polyline points="{points_str}" fill="none" stroke="{color}" stroke-width="1"/>'
+            )
 
 def draw_labels(svg_parts: list[str], labels, label_x, label_y_start, label_spacing):
     """Add series labels (Ni) in the top-right corner."""
