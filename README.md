@@ -69,6 +69,16 @@ Claude-Code settings are set to the `~/.claude/settings.json` file:
 - QV quantization:
     - tested with half-precision only (no quantization)
 
+## Speed test
+Each model inference speed is tested (on my hardware), with different context length, and different prompt processing batch-size.
+The results are in CSV files (I created them manually).  
+I wrote a script at [create-svg.py](speed-test/create-svg.py) that convert the CSV files to SVG images for better visualization.  
+MTP supporting models (Gemma) also has speed tests for MTP enhanced inference.  
+
+**Here an example** (NVIDIA-Nemotron-3-Nano-30B-A3B-Q4_K_M, KV-Cache: FP16, Context-Length: 512k)  
+<img width="500" src="speed-test/NVIDIA-Nemotron-3-Nano-30B-A3B-Q4_K_M/KV-Cache-FP16/512k-speed.svg"/>
+<img width="500" src="speed-test/NVIDIA-Nemotron-3-Nano-30B-A3B-Q4_K_M/KV-Cache-FP16/512k-ttft.svg"/>
+
 ## Claude Code testing
 
 - The tests are performed in 4 fields:
@@ -93,7 +103,7 @@ Put the solution in the folder "<Where-To-Put-The-Solution>"
 No more information is given to the agent!
 However, since the model start a task it has full control over the flow. If the model ask the user for more information, it will be provided.
 
-### Mode Inference
+### Model Inference
 All the models are loaded with the default parameters, unless explicitly said otherwise in `note.txt` file that will appear in the directory of change!  
 I build the project such as: when a folder has `note.txt` file, which explicitly states how the model is loaded, or how inference is configured. it recursively mark all the subdirectories too (unless another `note.txt` file state otherwise).
 
