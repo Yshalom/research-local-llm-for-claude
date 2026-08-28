@@ -1,0 +1,4 @@
+Image Projection:
+-----------------------------------------------------
+The mmproj-gemma-4-12B-it-BF16 sub-model is disabled.
+Interface with the language layers alone.
