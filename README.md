@@ -1,5 +1,5 @@
 # This Project Is Not Complete
-## I'll finish it in several days
+## I'll finish it soon
 ---
 ---
 ---
@@ -38,6 +38,11 @@ In the raising days of AI, and its integration at the development and coding tas
     - Mode: auto mode on
 ---
 
+### Model Inference
+All the models are loaded with the default parameters, unless explicitly said otherwise in `note.txt` file that will appear in the directory of change!  
+I build the project such as: when a folder has `note.txt` file, which explicitly states how the model is loaded, or how inference is configured. it recursively mark all the subdirectories too (unless another `note.txt` file state otherwise).
+
+
 ### Claude-Code set-up
 
 Claude Code is running inside docker-sandbox, the sandbox runs with the following additional environment variables (connecting Claude-Code to LM-Studio's server)
@@ -71,7 +76,7 @@ Claude-Code settings are set to the `~/.claude/settings.json` file:
 
 ## Speed test
 Each model inference speed is tested (on my hardware), with different context length, and different prompt processing batch-size.
-The results are in CSV files (I created them manually).  
+The results are in CSV files (I've written them manually).  
 I wrote a script at [create-svg.py](speed-test/create-svg.py) that convert the CSV files to SVG images for better visualization.  
 MTP supporting models (Gemma) also has speed tests for MTP enhanced inference.  
 
@@ -91,7 +96,7 @@ MTP supporting models (Gemma) also has speed tests for MTP enhanced inference.
 > The agent can't run C++ & CUDA code!
 
 > [!NOTE]
-> For the web tests, the agent can run headless browser.
+> For the web tests, the agent can run a headless browser.
 
 Each test is perfumed in auto mode, with the following request:
 ```
@@ -103,7 +108,57 @@ Put the solution in the folder "<Where-To-Put-The-Solution>"
 No more information is given to the agent!
 However, since the model start a task it has full control over the flow. If the model ask the user for more information, it will be provided.
 
-### Model Inference
-All the models are loaded with the default parameters, unless explicitly said otherwise in `note.txt` file that will appear in the directory of change!  
-I build the project such as: when a folder has `note.txt` file, which explicitly states how the model is loaded, or how inference is configured. it recursively mark all the subdirectories too (unless another `note.txt` file state otherwise).
+## Agentic evaluation summary
+Here is an evaluation summery of the agentic task tests given to each model.
+
+### CUDA
+> [!WARNING]
+> Nothing here yet. This section will be filled soon
+
+### Python
+
+Task summary:  
+*Create a command‑line program that reads one Sudoku puzzle from console, solves it using "backtracking with constraint propagation" (bitmask + MRV heuristic), and prints the solved grid to console. No GUI or external libraries are required.*
+
+| Model                                | Input | No Solution | Solving Skill | Efficiency | Trailing Code | Code Cleanness | Summary |
+| ------------------------------------ | ----- | ----------- | ------------- | ---------- | ------------- | -------------- | ------- |
+| Gemma-4-12B-it                       | 3     | 3           | 0             | 0          | 3             | 4              | 13/30   |
+| NVIDIA-Nemotron-3-Nano-30B-A3B       | 3     | 3           | 5             | 4          | 2             | 5              | 24/30   |
+| NVIDIA-Nemotron-3-Super-120B-A12B-UD | 4     | 5           | 5             | 4          | 4             | 5              | 27/30   |
+
+
+### Security
+
+Task summary:  
+*Determine whether the supplied source code (`source.cpp`) is secure.*
+
+**Test-1**  
+
+| Model                                | What you found? | False security issues | How could be it badly used? | Source code lines | Fix | Summary |
+| ------------------------------------ | --------------- | --------------------- | --------------------------- | ----------------- | --- | ------- |
+| Gemma-4-12B-it                       | 5               | 5                     | 3                           | 4                 | 5   | 22/25   |
+| NVIDIA-Nemotron-3-Nano-30B-A3B       | 5               | 5                     | 3                           | 4                 | 5   | 22/25   |
+| NVIDIA-Nemotron-3-Super-120B-A12B-UD | 5               | 5                     | 5                           | 5                 | 5   | 25/25   |
+
+
+**Test-2**  
+
+| Model                                | What you found? | False security issues | How could be it badly used? | Source code lines | Fix | Summary |
+| ------------------------------------ | --------------- | --------------------- | --------------------------- | ----------------- | --- | ------- |
+| Gemma-4-12B-it                       | 3               | 2                     | 3                           | 4                 | 5   | 17/25   |
+| NVIDIA-Nemotron-3-Nano-30B-A3B       | 0               | 5                     | 0                           | 0                 | 3   | 8/25    |
+| NVIDIA-Nemotron-3-Super-120B-A12B-UD | 5               | 5                     | 4                           | 4                 | 5   | 23/25   |
+
+**Test-3**  
+
+| Model                                | What you found? | False security issues | Source code lines | Fix | Summary |
+| ------------------------------------ | --------------- | --------------------- | ----------------- | --- | ------- |
+| Gemma-4-12B-it                       | 4               | 4                     | 4                 | 5   | 17/20   |
+| NVIDIA-Nemotron-3-Nano-30B-A3B       | 0               | 5                     | 0                 | 0   | 5/20    |
+| NVIDIA-Nemotron-3-Super-120B-A12B-UD | 4               | 1                     | 4                 | 5   | 14/20   |
+
+
+### Web
+> [!WARNING]
+> Nothing here yet. This section will be filled soon
 
