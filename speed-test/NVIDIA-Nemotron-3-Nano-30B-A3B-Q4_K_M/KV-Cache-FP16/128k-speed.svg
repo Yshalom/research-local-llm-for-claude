@@ -1,0 +1,106 @@
+<svg width="800" height="800" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <text x="400.0" y="30" text-anchor="middle" font-family="sans-serif" font-size="24" fill="blue">tok/sec</text>
+  <path d="M 80.00,740.00 80.00,80.00 M 128.57,740.00 128.57,80.00 M 177.14,740.00 177.14,80.00 M 225.71,740.00 225.71,80.00 M 274.29,740.00 274.29,80.00 M 322.86,740.00 322.86,80.00 M 371.43,740.00 371.43,80.00 M 420.00,740.00 420.00,80.00 M 468.57,740.00 468.57,80.00 M 517.14,740.00 517.14,80.00 M 565.71,740.00 565.71,80.00 M 614.29,740.00 614.29,80.00 M 662.86,740.00 662.86,80.00 M 711.43,740.00 711.43,80.00 M 760.00,740.00 760.00,80.00" stroke="#ddd" stroke-width="1" fill="none"/>
+  <path d="M 80.00,740.00 80.00,744.00 M 128.57,740.00 128.57,744.00 M 177.14,740.00 177.14,744.00 M 225.71,740.00 225.71,744.00 M 274.29,740.00 274.29,744.00 M 322.86,740.00 322.86,744.00 M 371.43,740.00 371.43,744.00 M 420.00,740.00 420.00,744.00 M 468.57,740.00 468.57,744.00 M 517.14,740.00 517.14,744.00 M 565.71,740.00 565.71,744.00 M 614.29,740.00 614.29,744.00 M 662.86,740.00 662.86,744.00 M 711.43,740.00 711.43,744.00 M 760.00,740.00 760.00,744.00" stroke="#777" stroke-width="1" fill="none"/>
+  <text x="80.00" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">844.8</text>
+  <text x="128.57" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">2589</text>
+  <text x="177.14" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">4334</text>
+  <text x="225.71" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">6078</text>
+  <text x="274.29" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">7823</text>
+  <text x="322.86" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">9567</text>
+  <text x="371.43" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">11312</text>
+  <text x="420.00" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">13056</text>
+  <text x="468.57" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">148</text>
+  <text x="517.14" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">16545</text>
+  <text x="565.71" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">18289</text>
+  <text x="614.29" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">20034</text>
+  <text x="662.86" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">21778</text>
+  <text x="711.43" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">23523</text>
+  <text x="760.00" y="756.00" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#777">25267</text>
+  <path d="M 80.00,740.00 760.00,740.00 M 80.00,692.86 760.00,692.86 M 80.00,645.71 760.00,645.71 M 80.00,598.57 760.00,598.57 M 80.00,551.43 760.00,551.43 M 80.00,504.29 760.00,504.29 M 80.00,457.14 760.00,457.14 M 80.00,410.00 760.00,410.00 M 80.00,362.86 760.00,362.86 M 80.00,315.71 760.00,315.71 M 80.00,268.57 760.00,268.57 M 80.00,221.43 760.00,221.43 M 80.00,174.29 760.00,174.29 M 80.00,127.14 760.00,127.14 M 80.00,80.00 760.00,80.00" stroke="#ddd" stroke-width="1" fill="none"/>
+  <path d="M 76.00,740.00 80.00,740.00 M 76.00,692.86 80.00,692.86 M 76.00,645.71 80.00,645.71 M 76.00,598.57 80.00,598.57 M 76.00,551.43 80.00,551.43 M 76.00,504.29 80.00,504.29 M 76.00,457.14 80.00,457.14 M 76.00,410.00 80.00,410.00 M 76.00,362.86 80.00,362.86 M 76.00,315.71 80.00,315.71 M 76.00,268.57 80.00,268.57 M 76.00,221.43 80.00,221.43 M 76.00,174.29 80.00,174.29 M 76.00,127.14 80.00,127.14 M 76.00,80.00 80.00,80.00" stroke="#777" stroke-width="1" fill="none"/>
+  <text x="72.00" y="744.00" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">40.54</text>
+  <text x="72.00" y="696.86" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">42.71</text>
+  <text x="72.00" y="649.71" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">44.87</text>
+  <text x="72.00" y="602.57" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">47.04</text>
+  <text x="72.00" y="555.43" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">49.2</text>
+  <text x="72.00" y="508.29" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">51.37</text>
+  <text x="72.00" y="461.14" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">53.53</text>
+  <text x="72.00" y="414.00" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">55.7</text>
+  <text x="72.00" y="366.86" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">57.87</text>
+  <text x="72.00" y="319.71" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">60.03</text>
+  <text x="72.00" y="272.57" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">62.2</text>
+  <text x="72.00" y="225.43" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">64.36</text>
+  <text x="72.00" y="178.29" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">66.53</text>
+  <text x="72.00" y="131.14" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">68.69</text>
+  <text x="72.00" y="84.00" text-anchor="end" font-family="sans-serif" font-size="14" fill="#777">70.86</text>
+  <path d="M 80.00,740.00 L 760.00,740.00 M 80.00,740.00 L 80.00,80.00" stroke="#777" stroke-width="2" fill="none"/>
+  <circle cx="99.25" cy="120.45" r="5" fill="red"/>
+  <text x="69.24528301886792" y="110.44992743105956" font-family="sans-serif" font-size="12" fill="red">(1536, 69)</text>
+  <circle cx="142.01" cy="98.68" r="5" fill="red"/>
+  <text x="112.01257861635219" y="116.67924528301899" font-family="sans-serif" font-size="12" fill="red">(3072, 70)</text>
+  <circle cx="184.78" cy="194.47" r="5" fill="red"/>
+  <text x="154.77987421383648" y="184.47024673439785" font-family="sans-serif" font-size="12" fill="red">(4608, 65.6)</text>
+  <circle cx="227.55" cy="283.73" r="5" fill="red"/>
+  <text x="197.54716981132074" y="301.73004354136435" font-family="sans-serif" font-size="12" fill="red">(6144, 61.5)</text>
+  <circle cx="270.31" cy="277.20" r="5" fill="red"/>
+  <text x="240.314465408805" y="267.1988388969522" font-family="sans-serif" font-size="12" fill="red">(7680, 61.8)</text>
+  <circle cx="313.08" cy="342.51" r="5" fill="red"/>
+  <text x="283.0817610062893" y="360.51088534107413" font-family="sans-serif" font-size="12" fill="red">(9216, 58.8)</text>
+  <circle cx="355.85" cy="381.70" r="5" fill="red"/>
+  <text x="325.8490566037736" y="371.69811320754724" font-family="sans-serif" font-size="12" fill="red">(10752, 57)</text>
+  <circle cx="398.62" cy="442.66" r="5" fill="red"/>
+  <text x="368.6163522012579" y="460.656023222061" font-family="sans-serif" font-size="12" fill="red">(12288, 54.2)</text>
+  <circle cx="441.38" cy="442.66" r="5" fill="red"/>
+  <text x="411.3836477987421" y="432.656023222061" font-family="sans-serif" font-size="12" fill="red">(13824, 54.2)</text>
+  <circle cx="484.15" cy="481.84" r="5" fill="red"/>
+  <text x="454.1509433962264" y="499.8432510885342" font-family="sans-serif" font-size="12" fill="red">(15360, 52.4)</text>
+  <circle cx="526.92" cy="544.98" r="5" fill="red"/>
+  <text x="496.9182389937107" y="534.9782293178521" font-family="sans-serif" font-size="12" fill="red">(16896, 49.5)</text>
+  <circle cx="569.69" cy="601.58" r="5" fill="red"/>
+  <text x="539.6855345911949" y="619.5820029027577" font-family="sans-serif" font-size="12" fill="red">(18432, 46.9)</text>
+  <circle cx="612.45" cy="599.40" r="5" fill="red"/>
+  <text x="582.4528301886792" y="589.4049346879536" font-family="sans-serif" font-size="12" fill="red">(19968, 47)</text>
+  <circle cx="655.22" cy="640.77" r="5" fill="red"/>
+  <text x="625.2201257861635" y="658.7692307692308" font-family="sans-serif" font-size="12" fill="red">(21504, 45.1)</text>
+  <circle cx="697.99" cy="627.71" r="5" fill="red"/>
+  <text x="667.9874213836478" y="617.7068214804063" font-family="sans-serif" font-size="12" fill="red">(23040, 45.7)</text>
+  <circle cx="740.75" cy="666.89" r="5" fill="red"/>
+  <text x="710.754716981132" y="684.8940493468796" font-family="sans-serif" font-size="12" fill="red">(24576, 43.9)</text>
+  <polyline points="99.25,120.45 142.01,98.68 184.78,194.47 227.55,283.73 270.31,277.20 313.08,342.51 355.85,381.70 398.62,442.66 441.38,442.66 484.15,481.84 526.92,544.98 569.69,601.58 612.45,599.40 655.22,640.77 697.99,627.71 740.75,666.89" fill="none" stroke="red" stroke-width="1"/>
+  <circle cx="99.25" cy="216.24" r="5" fill="blue"/>
+  <text x="69.24528301886792" y="206.24092888243854" font-family="sans-serif" font-size="12" fill="blue">(1536, 64.6)</text>
+  <circle cx="142.01" cy="207.53" r="5" fill="blue"/>
+  <text x="112.01257861635219" y="225.5326560232221" font-family="sans-serif" font-size="12" fill="blue">(3072, 65)</text>
+  <circle cx="184.78" cy="318.56" r="5" fill="blue"/>
+  <text x="154.77987421383648" y="308.5631349782294" font-family="sans-serif" font-size="12" fill="blue">(4608, 59.9)</text>
+  <circle cx="227.55" cy="340.33" r="5" fill="blue"/>
+  <text x="197.54716981132074" y="358.33381712627005" font-family="sans-serif" font-size="12" fill="blue">(6144, 58.9)</text>
+  <circle cx="270.31" cy="338.16" r="5" fill="blue"/>
+  <text x="240.314465408805" y="328.15674891146597" font-family="sans-serif" font-size="12" fill="blue">(7680, 59)</text>
+  <circle cx="313.08" cy="396.94" r="5" fill="blue"/>
+  <text x="283.0817610062893" y="414.93759071117574" font-family="sans-serif" font-size="12" fill="blue">(9216, 56.3)</text>
+  <circle cx="355.85" cy="444.83" r="5" fill="blue"/>
+  <text x="325.8490566037736" y="434.833091436865" font-family="sans-serif" font-size="12" fill="blue">(10752, 54.1)</text>
+  <circle cx="398.62" cy="512.32" r="5" fill="blue"/>
+  <text x="368.6163522012579" y="530.322206095791" font-family="sans-serif" font-size="12" fill="blue">(12288, 51)</text>
+  <circle cx="441.38" cy="525.38" r="5" fill="blue"/>
+  <text x="411.3836477987421" y="515.3846153846155" font-family="sans-serif" font-size="12" fill="blue">(13824, 50.4)</text>
+  <circle cx="484.15" cy="558.04" r="5" fill="blue"/>
+  <text x="454.1509433962264" y="576.0406386066765" font-family="sans-serif" font-size="12" fill="blue">(15360, 48.9)</text>
+  <circle cx="526.92" cy="579.81" r="5" fill="blue"/>
+  <text x="496.9182389937107" y="569.811320754717" font-family="sans-serif" font-size="12" fill="blue">(16896, 47.9)</text>
+  <circle cx="569.69" cy="634.24" r="5" fill="blue"/>
+  <text x="539.6855345911949" y="652.2380261248187" font-family="sans-serif" font-size="12" fill="blue">(18432, 45.4)</text>
+  <circle cx="612.45" cy="640.77" r="5" fill="blue"/>
+  <text x="582.4528301886792" y="630.7692307692308" font-family="sans-serif" font-size="12" fill="blue">(19968, 45.1)</text>
+  <circle cx="655.22" cy="684.31" r="5" fill="blue"/>
+  <text x="625.2201257861635" y="702.3105950653121" font-family="sans-serif" font-size="12" fill="blue">(21504, 43.1)</text>
+  <circle cx="697.99" cy="686.49" r="5" fill="blue"/>
+  <text x="667.9874213836478" y="676.4876632801162" font-family="sans-serif" font-size="12" fill="blue">(23040, 43)</text>
+  <circle cx="740.75" cy="721.32" r="5" fill="blue"/>
+  <text x="710.754716981132" y="739.3207547169812" font-family="sans-serif" font-size="12" fill="blue">(24576, 41.4)</text>
+  <polyline points="99.25,216.24 142.01,207.53 184.78,318.56 227.55,340.33 270.31,338.16 313.08,396.94 355.85,444.83 398.62,512.32 441.38,525.38 484.15,558.04 526.92,579.81 569.69,634.24 612.45,640.77 655.22,684.31 697.99,686.49 740.75,721.32" fill="none" stroke="blue" stroke-width="1"/>
+  <text x="750" y="30" font-family="sans-serif" font-size="16" fill="red">1k</text>
+  <text x="750" y="50" font-family="sans-serif" font-size="16" fill="blue">125k</text>
+</svg>
