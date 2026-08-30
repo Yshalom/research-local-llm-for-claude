@@ -84,6 +84,10 @@ MTP supporting models (Gemma) also has speed tests for MTP enhanced inference.
 <img width="500" src="speed-test/NVIDIA-Nemotron-3-Nano-30B-A3B-Q4_K_M/KV-Cache-FP16/512k-speed.svg"/>
 <img width="500" src="speed-test/NVIDIA-Nemotron-3-Nano-30B-A3B-Q4_K_M/KV-Cache-FP16/512k-ttft.svg"/>
 
+## MTP proxy
+In the [mtp](mtp/) folder, there is a small C++ program that implement a proxy for the underlying `llama.cpp` engine, used by LM-Studio. The proxy mimic the `llama.cpp` engine for LM-Studio, alters the command-line argument to support MTP, and passes them to the real `llama.cpp` engine.  
+See more at the [MTP-README](mtp/README.md)
+
 ## Claude Code testing
 
 - The tests are performed in 4 fields:
