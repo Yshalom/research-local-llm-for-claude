@@ -86,7 +86,7 @@ MTP supporting models (e.g., Gemma) also include speed tests for MTP enhanced in
 
 ## MTP proxy
 In the **[mtp/](mtp/)** folder there is a small C++ program that acts as a proxy for the underlying `llama.cpp` engine used by LM-Studio. The proxy mimics the `llama.cpp` engine for LM-Studio, modifies the command-line arguments to enable MTP support, and forwards them to the real `llama.cpp` engine.  
-See more details in the **[MTP-README](mtp/README.md)**.
+See more details in the **[MTP-README](mtp/readme.md)**.
 
 ## Claude Code testing
 
