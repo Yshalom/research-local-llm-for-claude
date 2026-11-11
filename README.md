@@ -22,12 +22,7 @@ In the early days of AI integration into development and coding tasks, new oppor
     - **CPU:** AMD Ryzen 9 9900X (12-cores/24-threads)
     - **Memory:** 2 sticks of G.Skill F5-6400J3239F48G (total 96GB, under-clocked to 6000MT/s for CPU compatibility)
 - **Software (host)**
-    - **OS:** Windows-11
-    - **LM-Studio:** 0.4.20
-    - **CUDA 12 llama.cpp (Windows):** v2.27.1
-    - **Driver:** NVIDIA Studio Driver 610.62
-    - **docker sbx version:** v0.38.0
-    - **Python:** 3.14.2
+    - It's specified on the speed tests' folders
 - **Software (sandbox)**
     - **OS:** Ubuntu 26.04 LTS
     - **Claude Code:** v2.1.224
